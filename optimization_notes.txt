@@ -1,0 +1,45 @@
+current optimum: only run 3D-matrix parts (Z) only of scov.m on GPU.
+run_classification G preprocessed: 175 sec per participant
+
+=================================== scov ==================================
+normal cov on GPU? --> no
+- CPU: 1.432 / 20.335
+- GPU: 2.406 / 20.972
+
+whole scov on GPU (e.g. half of the workers)? --> nope
+
+one participant without GPU: 858s
+                   with GPU: 192s (only in scov: meaned2 until nom)
+===========================================================================
+
+================================= workers =================================
+4 workers: 12 sec
+5 workers: 18 sec
+6 workers: 21 sec
+8 workers: 24 sec
+
+4 workers a 2 threads: 20 sec
+
+==> use 4 workers a 1 thread
+===========================================================================
+
+=================================== eig ===================================
+toeig = gpuArray(within_class_scatter) \ gpuArray(between_class_scatter);
+phi = gather(eig(toeig));
+
+eig: 14.476
+\:    0.758
+---------------------------------------------------------------------------
+toeig = within_class_scatter \ between_class_scatter;
+phi = eig(toeig);
+
+eig: 14.665
+\:    0.857
+---------------------------------------------------------------------------
+phi = eig(between_class_scatter, within_class_scatter);
+
+eig:  1.956
+---------------------------------------------------------------------------
+
+==> clearly: run two-argument version on CPU!
+===========================================================================
