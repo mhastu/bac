@@ -40,5 +40,7 @@ This Repository holds the software part of my bachelor's thesis. It's main targe
 ---
 # References
 [Müller-Putz et al., 2020] Schwarz, A., Escolano, C., Montesano, L., Müller-Putz, G. (2020). "Analyzing and Decoding Natural Reach-and-Grasp Actions Using Gel, Water and Dry EEG Systems" Frontiers in Neuroscience 14. doi: 10.3389/fnins.2020.00849 
+
 [Blankertz et al., 2011] Blankertz, B., Lemm, S., Treder, M., Haufe, S., and Müller, K.-R. (2011). "Single-trial analysis and classification of ERP components—a tutorial" NeuroImage 56, 814–825. doi: 10.1016/j.neuroimage.2010.06.048
+
 [Schäfer et al., 2005] Schäfer, Juliane and Strimmer, Korbinian. (2005). "A Shrinkage Approach to Large-Scale Covariance Matrix Estimation and Implications for Functional Genomics" Statistical Applications in Genetics and Molecular Biology, vol. 4, no. 1, 2005. https://doi.org/10.2202/1544-6115.1175
