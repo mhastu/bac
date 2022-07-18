@@ -5,6 +5,8 @@ This Repository holds the software part of my bachelor's thesis. It's main targe
 - How well can EEG signals be decoded in a cross-system manner?
   i.e. When training a classificator with single-trial EEG data of 3 different recording systems with data of 14 participants each, how well does it perform on each 15th, previously unseen, participant?
 
+Sources[^datensatz_studie][^blankertz_2011][^schaefer_shrinkage][^duda_pattern][^chance_level][^lehmann_gfp] are also referenced in the respective matlab files.
+
 # Software Documentation
 ## Definitions
 | Variable name | Description                                                                                                                                           |
