@@ -1,3 +1,6 @@
+% imports
+addpath datafunc
+
 R = 12;
 signal = rand(R, 100, 'single');
 latencies = 1:5:21;

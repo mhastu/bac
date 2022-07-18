@@ -17,7 +17,14 @@ function fig_results = plot_results(fig_results, filename_result, method, Devs, 
 % for calib and test for each participant. (80 percentage values --> peak
 % (best timepoint) is the highest, STD can be calculated). For Table 1.
 
+% imports
+addpath datafunc
+addpath util
+
 %% config
+load('config.mat', 'dir_training_datasets');
+load('config.mat', 'dir_results');
+
 if nargin < 6
     calib_cut = 0.66;
 end
@@ -53,7 +60,7 @@ systems = {'G', 'V', 'H'};
 device_color = {[0.9290 0.6940 0.1220], [0.133 0.471 0.698], [0.38 0.137 0.424]};  % accent color of each device
 
 %% load results
-load(['/home/michi/OneDrive/TU/Bac/matlab/results/' filename_result], ...
+load([dir_results filename_result], ...
      'calib_conf', 'test_conf');
 C = 3;  % number of classes
 np = size(calib_conf,2);  % number of participants
@@ -98,9 +105,9 @@ for dev=Devs
     % calib_significance = 0.458;
     switch(method)
         case 'rep'
-            calib_significance = adjust_chance_level(1/C, calib_cut*num_trials_in_sys(systems{dev}, filename_train)/np,alpha,T);
+            calib_significance = adjust_chance_level(1/C, calib_cut*num_trials_in_sys(systems{dev}, dir_training_datasets, filename_train)/np,alpha,T);
         case 'CP'
-            calib_significance = adjust_chance_level(1/C, calib_cut*num_trials_in_sys(systems{dev}, filename_train),alpha,T);
+            calib_significance = adjust_chance_level(1/C, calib_cut*num_trials_in_sys(systems{dev}, dir_training_datasets, filename_train),alpha,T);
         otherwise
             error('unknown method');
     end
@@ -156,9 +163,9 @@ for dev=Devs
     % test_significance = 0.428;
     switch(method)
         case 'rep'
-            test_significance = adjust_chance_level(1/C, (1-calib_cut)*num_trials_in_sys(systems{dev}, filename_train)/np,alpha,T);
+            test_significance = adjust_chance_level(1/C, (1-calib_cut)*num_trials_in_sys(systems{dev}, dir_training_datasets, filename_train)/np,alpha,T);
         case 'CP'
-            test_significance = adjust_chance_level(1/C, (1-calib_cut)*num_trials_in_sys(systems{dev}, filename_train),alpha,T);
+            test_significance = adjust_chance_level(1/C, (1-calib_cut)*num_trials_in_sys(systems{dev}, dir_training_datasets, filename_train),alpha,T);
         otherwise
             error('unknown method');
     end

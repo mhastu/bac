@@ -1,6 +1,10 @@
 function [test_conf, timepoint, calib_conf, calib_gamma, test_gamma] = run_classification_for(calib_classes, test_classes, cv_repetitions)
 %RUN_CLASSIFICATION_FOR Run classification for given calibration and test classes.
 
+    % imports
+    addpath datafunc
+    addpath LDA
+
     % check inputs
     C = length(calib_classes);
     if (length(test_classes) ~= C)

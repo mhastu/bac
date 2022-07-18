@@ -3,9 +3,11 @@ function [classify, gamma] = train_mda(classes)
 %
 %   classify = TRAIN_MDA(classes) returns the classify function of the
 %       trained model which can be applied for evaluation.
-%       classes: cell consisting of classes: { class_1, ..., class_C }
-%           class i: ni-by-D matrix.
-%           D...number of features, ni...number of trainals in class i
+%       classes: { trainals_1, ..., trainals_C }
+%           C...number of classes
+%           class i: n_i-by-D matrix.
+%               D...number of features
+%               n_i...number of trainals in class i
 %
 %   [classify, gamma] = TRAIN_MDA(classes) also returns the estimated
 %       shrinkage parameters for each class (1-by-C matrix)
@@ -31,9 +33,9 @@ function [classify, gamma] = train_mda(classes)
         %       m...number of features
 
         probs = zeros(size(z, 1), C);
-        for k=1:C
-            % discriminant function for class k (chapter 5.2.2 in duda)
-            probs(:,k) = [ones(size(z, 1), 1) z] * W(k,:).';
+        for c=1:C
+            % discriminant function for class c (chapter 5.2.2 in duda)
+            probs(:,c) = [ones(size(z, 1), 1) z] * W(c,:).';
         end
 
         % report indices of maximum probability

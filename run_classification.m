@@ -5,7 +5,18 @@
 % 1. configure
 % 2. run
 
-% config
+% imports
+addpath classification_reproduction
+addpath plot
+
+warning("off","parallel:gpu:device:DeviceDeprecated");
+
+load('config.mat', 'dir_training_datasets');
+load('config.mat', 'dir_results');
+
+% =========================================================================
+% CONFIG
+% -------------------------------------------------------------------------
 filename = '_preprocessed_without_ica.mat';
 filename_save = '_V_without_ica_randcalib.mat';
 randcalib = true;  % if calibration data should be randomly selected among trials
@@ -14,6 +25,7 @@ notify = true;  % play sound when finished
 participant_indices = [3 4 6 8 10 11 12 13 14];
 
 calibration_cut = 0.66;
+% =========================================================================
 
 calib_conf = cell(3, 15);
 calib_gamma = cell(3, 15);
@@ -30,7 +42,7 @@ for type_i=types_i
 
         id = [types{type_i} num2str(p, '%02d')];
         classes_ = load( ...
-            ['/home/michi/OneDrive/TU/Bac/matlab/training_datasets/' id filename], ...
+            [dir_training_datasets id filename], ...
             'rest', 'palmar', 'lateral');
         classes = {classes_.rest,...
             classes_.palmar,...
@@ -59,7 +71,7 @@ for type_i=types_i
     end
 end
 
-save(['results/classification' filename_save], 'calib_conf', 'calib_gamma', 'test_conf', 'test_gamma', 'timepoint', 'run_times');
+save([dir_results 'classification' filename_save], 'calib_conf', 'calib_gamma', 'test_conf', 'test_gamma', 'timepoint', 'run_times');
 plot_results([], ['classification' filename_save], 'rep', types_i, filename, calibration_cut);
 
 if notify

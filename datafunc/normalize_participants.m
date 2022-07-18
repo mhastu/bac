@@ -12,6 +12,9 @@ function [classes] = normalize_participants(classes, class_i)
 %   Grand average GFP should stay the same (minimizes floating point
 %   errors).
 
+    % imports
+    addpath util
+
     gfp = NaN(15, 1);
     for p=1:size(classes,1)
         gfp(p) = mean(GFP(classes{p, class_i}), 'all');

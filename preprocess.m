@@ -13,14 +13,21 @@
 % 4. (only if GEL or VERSATILE) run fourth section (check)
 % 4. (only if GEL or VERSATILE) run fifth section (post-ICA)
 
+% imports
+addpath preprocess
+
 %% config
+% =========================================================================
+% CONFIG
+% -------------------------------------------------------------------------
 participant_index = 15;  % between 1 and 15
 eeg_system = 'H';       % 'G', 'V' or 'H'
 filename_ica = '_preprocessed_ica.set';  % eeglab dataset name for caching the data before manually removing ICA components
 filename = '_preprocessed.mat';  % training dataset name (saved as)
+% =========================================================================
 
 id = [eeg_system num2str(participant_index, '%02d')];
-
+load('config.mat', 'dir_eeglab');
 if ~exist('pop_importdata', 'file') || ...
             ~exist('eeg_checkset', 'file') || ...
             ~exist('pop_chanedit', 'file') || ...
@@ -28,8 +35,8 @@ if ~exist('pop_importdata', 'file') || ...
             ~exist('pop_resample', 'file') || ...
             ~exist('pop_runica', 'file') || ...
             ~exist('pop_saveset', 'file') % check for eeglab functions
-    if exist('eeglab2021.1', 'dir')
-        addpath eeglab2021.1
+    if exist(dir_eeglab, 'dir')
+        addpath(dir_eeglab)
     end
     if ~exist('eeglab', 'file')
         error('eeglab not found');
@@ -43,7 +50,8 @@ preprocess_ica(participant_index, eeg_system, filename_ica);
 
 %% remove artifacts by removing ICA components
 % File -> Load existing Dataset
-EEG = pop_loadset('filename',[id filename_ica],'filepath','/home/michi/OneDrive/TU/Bac/matlab/eeglab_datasets/');
+load('config.mat', 'dir_eeglab_datasets');
+EEG = pop_loadset('filename',[id filename_ica],'filepath',dir_eeglab_datasets);
 
 latencies = [EEG.event.latency];
 fprintf(['Eye blinking: ' num2str(latencies(strcmp({EEG.event.type}, 'EBon'))/EEG.srate) ' seconds\n']);
@@ -72,7 +80,8 @@ EEG = pop_subcomp(EEG);
 pop_eegplot( EEG, 1, 1, 1);
 
 %% post-ICA
-load(['/home/michi/bac/data/' id '.mat'], 'header');
+load('config.mat', 'dir_eeg_data');
+load([dir_eeg_data id '.mat'], 'header');
 
-preprocess_finish(EEG, header, ...
-    ['/home/michi/OneDrive/TU/Bac/matlab/training_datasets/' id filename]);
+load('config.mat', 'dir_training_datasets');
+preprocess_finish(EEG, header, [dir_training_datasets id filename]);

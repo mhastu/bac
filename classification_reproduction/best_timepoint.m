@@ -3,8 +3,9 @@ function [timepoint_i, conf, gamma] = best_timepoint(classes, t_indices, cv_repe
 %
 %   timepoint_i = BEST_TIMEPOINT(classes, t_indices) returns the timepoint
 %       index (in t_indices) of the best performing model.
-%       classes: {trials_1, trials_2, ...}
-%           trials_i: R x L x N matrix
+%       classes: { trials_1, ..., trials_C }
+%           C...number of classes
+%           trials_i: R-by-L-by-N matrix
 %               R...number of channels
 %               L...number of ampvals per trial
 %               N...number of trials
@@ -13,11 +14,15 @@ function [timepoint_i, conf, gamma] = best_timepoint(classes, t_indices, cv_repe
 %
 %   [timepoint_i, conf] = BEST_TIMEPOINT(classes, t_indices)
 %       also returns the confusion matrix for each timepoint in the WOI
-%       (C x C x T matrix).
+%       (C-by-C-by-T matrix).
 %
 %   [timepoint_i, conf, gamma] = BEST_TIMEPOINT(classes, t_indices)
 %       also returns the gamma values for each fold, class, repetition and
 %       timepoint.
+
+    % imports
+    addpath datafunc
+    addpath LDA
 
     %config
     if nargin < 3
@@ -57,7 +62,6 @@ function [timepoint_i, conf, gamma] = best_timepoint(classes, t_indices, cv_repe
         fprintf('\b|\n');
     end
     [~, timepoint_i] = max(accuracies);
-    %conf = confs(:,:,timepoint_i);
     conf = confs;  % report the un-normalized confusion-matrices for all timepoints
 end
 

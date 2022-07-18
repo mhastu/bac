@@ -1,7 +1,6 @@
-function n = num_trials_in_sys(sys, filename_end)
+function n = num_trials_in_sys(sys, dir, filename_end)
 %NUM_TRIALS_IN_SYS Number of trials in system after preprocessing.
 
-    dir = '/home/michi/OneDrive/TU/Bac/matlab/training_datasets/';
     np = 15;  % number of participants
     vars = {'rest', 'palmar', 'lateral'};  % variable names containing samples
     sample_dim = 3;  % dimension in which the samples are stored in above vars

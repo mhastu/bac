@@ -1,13 +1,14 @@
 function [a, gamma] = LDA(classes)
 %LDA train shrinkage-based linear discriminant model and return weights.
-%   a = LDA(trainals, trainal_labels) returns the weights incl. bias.
-%       trainals: N-by-D matrix (training data)
-%           N...number of samples
-%           D...number of features
-%       labels: N-by-1 matrix defining the class of each trainal (row in
-%           trainals).
+%   a = LDA(classes) returns the weights incl. bias.
+%       classes: { trainals_1, ..., trainals_C }
+%           C...number of classes
+%           trainals_i: n_i-by-D matrix (training data)
+%               D...number of features
+%               n_i...number of trainals in class i
+%       a: C-by-D+1 matrix ([w_0 w])
 %   [a, gamma] = LDA(trainals, trainal_labels) also returns the shrinkage
-%       parameter used for each class.
+%       parameter used for each class (C-by-1 column vector).
 %
 %   based on duda et al., 2001: pattern classification
 

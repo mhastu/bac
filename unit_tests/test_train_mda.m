@@ -1,3 +1,6 @@
+% imports
+addpath LDA
+
 % create quite hardly distinguishable trainals
 dim = 522;  % number of features
 C = 3;

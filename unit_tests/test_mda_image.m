@@ -1,6 +1,9 @@
 % Test train_mda
 % not a classical unit test
 
+% imports
+addpath LDA
+
 %% config
 mu1 = [0, 0];
 mu2 = [5, -5];

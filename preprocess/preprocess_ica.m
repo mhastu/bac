@@ -1,6 +1,6 @@
 function [] = preprocess_ica(p, sys, filename, rm12, run_ica)
-%PREPROCESS_ICA Preprocessing until (incl.) the ICA step.
-%   After that, components must be manually removed (can't run in a
+%PREPROCESS_ICA Preprocessing until (incl.) running an ICA algorithm.
+%   After that, indep. components must be manually removed (can't run in a
 %   function).
 %   The loaded dataset is not added to the EEGLAB GUI! If you want to add
 %   it, issue:
@@ -11,6 +11,13 @@ function [] = preprocess_ica(p, sys, filename, rm12, run_ica)
 %       participant p (1:15) and and system type sys ('G', 'V', 'H') and
 %       saves the dataset, which can then be used for removing ICA
 %       components and finishing the preprocessing.
+
+    % imports
+    addpath util
+
+    load('config.mat', 'dir_eeg_data');
+    load('config.mat', 'dir_eeglab_datasets');
+    load('config.mat', 'dir_eeglab');
 
     if nargin < 5
         run_ica = true;
@@ -34,14 +41,15 @@ function [] = preprocess_ica(p, sys, filename, rm12, run_ica)
     % =====================================================================
     % load data
     % ---------------------------------------------------------------------
-    load(['/home/michi/bac/data/' id '.mat'], 'signal', 'header', 'events');
+    load([dir_eeg_data id '.mat'], 'signal', 'header', 'events');
     % =====================================================================
 
     channels = [header.channels_eeg header.channels_eog];
     if strcmp(header.device_type, 'hero') && rm12
         % remove channel 'A2' (left out in datensatz_studie)
         % achieved best results when removing this channel
-        channels = header.channels_eeg(~strcmp(header.channels_labels(header.channels_eeg), 'A2'));
+        channels = header.channels_eeg(...
+            ~strcmp(header.channels_labels(header.channels_eeg), 'A2'));
         signal = signal(channels,:);
     end
 
@@ -53,7 +61,8 @@ function [] = preprocess_ica(p, sys, filename, rm12, run_ica)
     % array: signal
     % Dataset name: <id>
     % Data sampling rate: <header.sample_rate>
-    EEG = pop_importdata('dataformat','array','nbchan',0,'data',signal,'setname',id,'srate',header.sample_rate,'pnts',0,'xmin',0);
+    EEG = pop_importdata('dataformat','array','nbchan',0,'data',signal,...
+        'setname',id,'srate',header.sample_rate,'pnts',0,'xmin',0);
     EEG = eeg_checkset( EEG );
     % =====================================================================
 
@@ -68,11 +77,12 @@ function [] = preprocess_ica(p, sys, filename, rm12, run_ica)
         instruction_list{(c_i-1)*4+3} = channels(c_i);
         instruction_list{(c_i-1)*4+4} = 'changefield';
         instruction_list{(c_i-1)*4+5} = {channels(c_i), 'labels',...
-            convert_channel_label(header.channels_labels{channels(c_i)}),'datachan',1};
+            convert_channel_label(header.channels_labels{channels(c_i)}),...
+            'datachan',1};
     end
     EEG = pop_chanedit(instruction_list{:});
     EEG = pop_chanedit(EEG, 'lookup', ...
-        '/home/michi/OneDrive/TU/Bac/matlab/eeglab2021.1/plugins/dipfit/standard_BEM/elec/standard_1005.elc');
+        [dir_eeglab 'plugins/dipfit/standard_BEM/elec/standard_1005.elc']);
     % =====================================================================
 
     % =====================================================================
@@ -122,7 +132,7 @@ function [] = preprocess_ica(p, sys, filename, rm12, run_ica)
     % -----------------------------------------------------------------
     pop_saveset(EEG, ...
         'filename', [id filename], ...
-        'filepath', '/home/michi/OneDrive/TU/Bac/matlab/eeglab_datasets/');
+        'filepath', dir_eeglab_datasets);
     fprintf(['File ' id filename ' saved in eeglab_datasets\n']);
     % =================================================================
 end

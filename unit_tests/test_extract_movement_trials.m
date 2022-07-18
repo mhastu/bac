@@ -1,3 +1,6 @@
+% imports
+addpath datafunc
+
 R = 12;
 frame = [-3 3];
 eeg = struct('event', struct());

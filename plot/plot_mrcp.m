@@ -16,11 +16,12 @@ WOI = int32(WOI_s * fs);  % window of interest in ampvals
 WOI_i = WOI(1):WOI(2)-1;
 
 %% load
+load('config.mat', 'dir_eeglab_datasets');
 PMclass = [];
 LMclass = [];
 for p=participants
     id = [sys num2str(p, '%02d')];
-    EEG = pop_loadset('filename',[id filename],'filepath','/home/michi/OneDrive/TU/Bac/matlab/eeglab_datasets/');
+    EEG = pop_loadset('filename',[id filename],'filepath',dir_eeglab_datasets);
 
     urchans = {EEG.chanlocs.urchan};  % convert to cell array. this can't go in a single line, because matlab
     urchan = urchans{strcmp({EEG.chanlocs.labels}, channel)};

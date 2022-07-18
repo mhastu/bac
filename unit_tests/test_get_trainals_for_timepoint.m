@@ -1,3 +1,6 @@
+% imports
+addpath datafunc
+
 R = 10;%           R...number of channels
 L = 20;%           L...number of ampvals per trial
 N = 10;%           N...number of trials

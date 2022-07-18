@@ -5,9 +5,20 @@
 % 1. configure
 % 2. run
 
+% imports
+% reuse functions for single-participant classification
+addpath classification_reproduction
+addpath datafunc
+addpath plot
+
 warning("off","parallel:gpu:device:DeviceDeprecated");
 
-% ================================ config =================================
+load('config.mat', 'dir_training_datasets');
+load('config.mat', 'dir_results');
+
+% =========================================================================
+% CONFIG
+% -------------------------------------------------------------------------
 filename = '_preprocessed_without_ica.mat';
 filename_save = '_G_without_ica_norm.mat';
 cv_repetitions = 1;  % we should have enough data for accurate results without repeating cv
@@ -21,7 +32,7 @@ classes = cell(15, 3);  % 15 participants, 3 classes
 for p=1:15
     id = [devices{device_i} num2str(p, '%02d')];
     classes_ = load( ...
-        ['/home/michi/OneDrive/TU/Bac/matlab/training_datasets/' id filename], ...
+        [dir_training_datasets id filename], ...
         'rest', 'palmar', 'lateral');
     classes{p,1} = classes_.rest;
     classes{p,2} = classes_.palmar;
@@ -58,5 +69,5 @@ for p=1:15
     run_times(device_i, p) = toc;
 end
 
-save(['results/CP_classification' filename_save], 'calib_conf', 'calib_gamma', 'test_conf', 'test_gamma', 'timepoint', 'run_times');
+save([dir_results 'CP_classification' filename_save], 'calib_conf', 'calib_gamma', 'test_conf', 'test_gamma', 'timepoint', 'run_times');
 plot_results([], ['CP_classification' filename_save], 'CP', device_i, filename, 14/15);
