@@ -11,6 +11,11 @@ function [classify, gamma] = train_mda(classes)
 %
 %   [classify, gamma] = TRAIN_MDA(classes) also returns the estimated
 %       shrinkage parameters for each class (1-by-C matrix)
+%
+%   Bayes Classifier is based on Duda et al., 2001: Pattern Classification
+%
+%   References:
+%   [Duda et al., 2011]: Duda, R.O., Hart, P.E., Stork, D.G., 2001. Pattern Classification, 2nd Edition. Wiley & Sons. ISBN: 978-0-471-05669-0
 
     C = length(classes);
 
@@ -34,7 +39,8 @@ function [classify, gamma] = train_mda(classes)
 
         probs = zeros(size(z, 1), C);
         for c=1:C
-            % discriminant function for class c (chapter 5.2.2 in duda)
+            % discriminant function for class c
+            % (chapter 5.2.2 in [Duda et al., 2011])
             probs(:,c) = [ones(size(z, 1), 1) z] * W(c,:).';
         end
 

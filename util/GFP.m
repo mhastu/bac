@@ -7,11 +7,14 @@ function gfp = GFP(ampvals)
 %           size(ampvals, 1) is the number of channels
 %       gfp: N-Dimensional matrix with size(gfp, 1) being 1. contains the
 %           GFP for each input dimension.
+%
+%   References:
+%   [Lehmann et al., 1980]: Lehmann, D., Skrandies, W. (1980). "Reference-free identification of components of checkerboard-evoked multichannel potential fields." Electroenceph. Clin. Neurophysiol., 1980. 48: 609-621.
 
     N = length(size(ampvals));  % dimensionality of input matrix
     n = size(ampvals, 1);  % number of channels
 
-    % formula 1A in lehmann1980: RMS (reference-free):
+    % formula 1A in [Lehmann et al., 1980]: RMS (reference-free):
     % GFP = sqrt( 1/(2n) * sum_i=1^n sum_j=1^n (u_i - u_j)^2 )
     addmat = permute(ampvals, [N+1 1 2:N]);
     submat = permute(ampvals, [1 N+1 2:N]);

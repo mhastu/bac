@@ -132,7 +132,7 @@ function [ntrials_rej, ntrials_total] = preprocess_finish(eeg, header, filename,
     % ---------------------------------------------------------------------
     train_channels = header.channels_eeg;
     if strcmp(header.device_type, 'hero')
-        % remove channel 'A2' (left out in datensatz_studie)
+        % remove channel 'A2' (left out in [Müller-Putz et al., 2020])
         train_channels = header.channels_eeg(~strcmp(header.channels_labels(header.channels_eeg), 'A2'));
     end
     rest = get_trials_from_frames(eeg.data(train_channels, :), rest_start, rest_len);

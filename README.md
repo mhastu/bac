@@ -1,5 +1,5 @@
-# Single-Trial Classification of EEG data from Gel, Water and Dry Systems
-This Repository holds the software part of my bachelor's thesis. It's main target is to continue the work of [Müller-Putz et al., 2020], answering following questions:
+# Single-Trial Decoding of EEG data from Gel, Water and Dry Systems
+This Repository holds the software part of my bachelor's thesis. It's main target is to continue the work of Müller-Putz et al.[^datensatz_studie], answering following questions:
 - How well can EEG signals be decoded in a cross-participant manner?
   i.e. When training a classificator with single-trial EEG data of 14 different participants, how well does it perform on a 15th, previously unseen, participant?
 - How well can EEG signals be decoded in a cross-system manner?
@@ -7,8 +7,8 @@ This Repository holds the software part of my bachelor's thesis. It's main targe
 
 # Software Documentation
 ## Definitions
-| Variable name | Description                                                                                                                                        |
-|---------------|----------------------------------------------------------------------------------------------------------------------------------------------------|
+| Variable name | Description                                                                                                                                           |
+|---------------|-------------------------------------------------------------------------------------------------------------------------------------------------------|
 | `signal`      | EEG signal (`R-by-X` matrix)                                                                                                                          |
 | `ampval`      | single amplitude value in signal ("sample" is ambiguous when talking about training)                                                                  |
 | `trial`       | part of signal where an event happens (`R-by-L` matrix)                                                                                               |
@@ -30,7 +30,7 @@ This Repository holds the software part of my bachelor's thesis. It's main targe
 | `D`           | number of features/ampvals (when talking about training) |
 
 ## files names
-## eeglab_datasets
+### eeglab_datasets (unversioned)
 | filename   | description                                                           |
 |------------|-----------------------------------------------------------------------|
 | `_ica.set` | after running ICA algo on data, before removing components            |
@@ -39,8 +39,14 @@ This Repository holds the software part of my bachelor's thesis. It's main targe
 
 ---
 # References
-[Müller-Putz et al., 2020] Schwarz, A., Escolano, C., Montesano, L., Müller-Putz, G. (2020). "Analyzing and Decoding Natural Reach-and-Grasp Actions Using Gel, Water and Dry EEG Systems" Frontiers in Neuroscience 14. doi: 10.3389/fnins.2020.00849 
+[^datensatz_studie]: [Müller-Putz et al., 2020] Schwarz, A., Escolano, C., Montesano, L., Müller-Putz, G. (2020). "Analyzing and Decoding Natural Reach-and-Grasp Actions Using Gel, Water and Dry EEG Systems" Frontiers in Neuroscience 14. https://doi.org/10.3389/fnins.2020.00849
 
-[Blankertz et al., 2011] Blankertz, B., Lemm, S., Treder, M., Haufe, S., and Müller, K.-R. (2011). "Single-trial analysis and classification of ERP components—a tutorial" NeuroImage 56, 814–825. doi: 10.1016/j.neuroimage.2010.06.048
+[^blankertz_2011]: [Blankertz et al., 2011] Blankertz, B., Lemm, S., Treder, M., Haufe, S., and Müller, K.-R. (2011). "Single-trial analysis and classification of ERP components—a tutorial" NeuroImage 56, 814–825. https://doi.org/10.1016/j.neuroimage.2010.06.048
 
-[Schäfer et al., 2005] Schäfer, Juliane and Strimmer, Korbinian. (2005). "A Shrinkage Approach to Large-Scale Covariance Matrix Estimation and Implications for Functional Genomics" Statistical Applications in Genetics and Molecular Biology, vol. 4, no. 1, 2005. https://doi.org/10.2202/1544-6115.1175
+[^schaefer_shrinkage]: [Schäfer et al., 2005] Schäfer, Juliane and Strimmer, Korbinian. (2005). "A Shrinkage Approach to Large-Scale Covariance Matrix Estimation and Implications for Functional Genomics" Statistical Applications in Genetics and Molecular Biology, vol. 4, no. 1, 2005. https://doi.org/10.2202/1544-6115.1175
+
+[^duda_pattern]: [Duda et al. 2001] Duda, R.O., Hart, P.E., Stork, D.G. (2001). "Pattern Classification", 2nd Edition. Wiley & Sons. ISBN: 978-0-471-05669-0
+
+[^chance_level]: [Combrisson et al., 2015] Combrisson, E., Jerbi, K. (2015). "Exceeding chance level by chance: The caveat of theoretical chance levels in brain signal classification and statistical assessment of decoding accuracy". Journal of Neuroscience Methods, Volume 250, 2015, Pages 126-136. https://dx.doi.org/10.1016/j.jneumeth.2015.01.010
+
+[^lehmann_gfp]: [Lehmann et al., 1980] Lehmann, D., Skrandies, W. (1980). "Reference-free identification of components of checkerboard-evoked multichannel potential fields." Electroenceph. Clin. Neurophysiol., 1980. 48: 609-621. https://doi.org/10.1016/0013-4694(80)90419-8

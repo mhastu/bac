@@ -10,7 +10,10 @@ function [a, gamma] = LDA(classes)
 %   [a, gamma] = LDA(trainals, trainal_labels) also returns the shrinkage
 %       parameter used for each class (C-by-1 column vector).
 %
-%   based on duda et al., 2001: pattern classification
+%   Based on [Duda et al., 2001]
+%
+%   References:
+%   [Duda et al., 2001] Duda, R.O., Hart, P.E., Stork, D.G., 2001. Pattern Classification, 2nd Edition. Wiley & Sons.
 
     C = length(classes);      % number of classes
     D = size(classes{1}, 2);  % number of features (assumend equal for all classes)
@@ -37,10 +40,11 @@ function [a, gamma] = LDA(classes)
 
     a = zeros(C,D+1);  % weights incl. bias a = [w_0 w]
     for c = 1:C
-        %  eq (59), section 2.6.2 in duda
+        % eq (59), section 2.6.2 in [Duda et al., 2001]
         a(c,2:end) = dmean(c,:) / covmat;  % w
 
-        %  eq (60), section 2.6.2 in duda (prior is assumed uniform)
+        % eq (60), section 2.6.2 in [Duda et al., 2001]
+        % (prior is assumed to be uniform)
         a(c,1) = -0.5 * a(c,2:end) * dmean(c,:)';  % w_0
     end
 end

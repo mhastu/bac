@@ -46,7 +46,7 @@ function [] = preprocess_ica(p, sys, filename, rm12, run_ica)
 
     channels = [header.channels_eeg header.channels_eog];
     if strcmp(header.device_type, 'hero') && rm12
-        % remove channel 'A2' (left out in datensatz_studie)
+        % remove channel 'A2' (left out in [Müller-Putz et al., 2020])
         % achieved best results when removing this channel
         channels = header.channels_eeg(...
             ~strcmp(header.channels_labels(header.channels_eeg), 'A2'));

@@ -1,4 +1,4 @@
-% runs the classification as in datensatz_studie
+% runs the classification as in [Müller-Putz et al., 2020]
 % workspace then contains the confusion matrices and scores per timepoint
 %
 % steps:

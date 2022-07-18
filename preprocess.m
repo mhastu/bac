@@ -1,4 +1,4 @@
-% preprocessing described in datensatz_studie
+% preprocessing described in [Müller-Putz et al., 2020]
 % to use gui, issue:
 % [ALLEEG EEG CURRENTSET] = pop_newset(ALLEEG, EEG, max(size(ALLEEG)),'gui','off');
 % Open preferences and 'cancel' to reload GUI.
