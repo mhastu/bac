@@ -12,7 +12,7 @@ function [classify, gamma] = train_mda(classes)
 %   [classify, gamma] = TRAIN_MDA(classes) also returns the estimated
 %       shrinkage parameters for each class (1-by-C matrix)
 %
-%   Bayes Classifier is based on Duda et al., 2001: Pattern Classification
+%   Bayes Classifier is based on "Pattern Classification" [Duda et al., 2011]
 %
 %   References:
 %   [Duda et al., 2011]: Duda, R.O., Hart, P.E., Stork, D.G., 2001. Pattern Classification, 2nd Edition. Wiley & Sons. ISBN: 978-0-471-05669-0
