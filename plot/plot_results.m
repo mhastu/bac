@@ -60,7 +60,7 @@ systems = {'G', 'V', 'H'};
 device_color = {[0.9290 0.6940 0.1220], [0.133 0.471 0.698], [0.38 0.137 0.424]};  % accent color of each device
 
 %% load results
-load([dir_results filename_result], ...
+load(fullfile(dir_results, filename_result), ...
      'calib_conf', 'test_conf');
 C = 3;  % number of classes
 np = size(calib_conf,2);  % number of participants

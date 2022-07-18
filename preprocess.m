@@ -81,7 +81,7 @@ pop_eegplot( EEG, 1, 1, 1);
 
 %% post-ICA
 load('config.mat', 'dir_eeg_data');
-load([dir_eeg_data id '.mat'], 'header');
+load(fullfile(dir_eeg_data, [id '.mat']), 'header');
 
 load('config.mat', 'dir_training_datasets');
-preprocess_finish(EEG, header, [dir_training_datasets id filename]);
+preprocess_finish(EEG, header, fullfile(dir_training_datasets, [id filename]));

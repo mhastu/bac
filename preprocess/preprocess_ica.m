@@ -41,7 +41,7 @@ function [] = preprocess_ica(p, sys, filename, rm12, run_ica)
     % =====================================================================
     % load data
     % ---------------------------------------------------------------------
-    load([dir_eeg_data id '.mat'], 'signal', 'header', 'events');
+    load(fullfile(dir_eeg_data, [id '.mat']), 'signal', 'header', 'events');
     % =====================================================================
 
     channels = [header.channels_eeg header.channels_eog];
@@ -82,7 +82,7 @@ function [] = preprocess_ica(p, sys, filename, rm12, run_ica)
     end
     EEG = pop_chanedit(instruction_list{:});
     EEG = pop_chanedit(EEG, 'lookup', ...
-        [dir_eeglab 'plugins/dipfit/standard_BEM/elec/standard_1005.elc']);
+        fullfile(dir_eeglab, 'plugins/dipfit/standard_BEM/elec/standard_1005.elc'));
     % =====================================================================
 
     % =====================================================================
@@ -133,7 +133,7 @@ function [] = preprocess_ica(p, sys, filename, rm12, run_ica)
     pop_saveset(EEG, ...
         'filename', [id filename], ...
         'filepath', dir_eeglab_datasets);
-    fprintf(['File ' id filename ' saved in eeglab_datasets\n']);
+    fprintf(['File ' id filename ' saved in ' dir_eeglab_datasets '\n']);
     % =================================================================
 end
 

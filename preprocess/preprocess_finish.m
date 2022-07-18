@@ -138,15 +138,15 @@ function [ntrials_rej, ntrials_total] = preprocess_finish(eeg, header, filename,
     rest = get_trials_from_frames(eeg.data(train_channels, :), rest_start, rest_len);
     palmar = get_trials_from_frames(eeg.data(train_channels, :), palm_start, palm_len);
     lateral = get_trials_from_frames(eeg.data(train_channels, :), lat_start, lat_len);
-    save([dir_training_datasets filename], ...
+    save(fullfile(dir_training_datasets, filename), ...
         'rest', 'palmar', 'lateral', 'rest_start', 'rest_len', 'palm_start', 'palm_len', 'lat_start', 'lat_len');
-    fprintf(['File ' filename ' saved in training_datasets\n']);
+    fprintf(['File ' filename ' saved in ' dir_training_datasets '\n']);
 
     % also save EEGLAB dataset
     pop_saveset(eeg, ...
         'filename', [filename '.set'], ...
         'filepath', dir_eeglab_datasets);
-    fprintf(['File ' filename '.set saved in eeglab_datasets\n']);
+    fprintf(['File ' filename '.set saved in ' dir_eeglab_datasets '\n']);
     % =====================================================================
 end
 

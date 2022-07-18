@@ -24,7 +24,7 @@ for sys=systems
         id = [sys num2str(p, '%02d')];
 
         EEG = pop_loadset('filename',[id filename_ica],'filepath',dir_eeglab_datasets);
-        load([dir_eeg_data id '.mat'], 'header');
+        load(fullfile(dir_eeg_data, [id '.mat']), 'header');
         [ntrials_rej_tmp, ntrials_total_tmp] = preprocess_finish(EEG, header, [id filename], rest_wait);
         ntrials_rej = ntrials_rej + ntrials_rej_tmp;
         ntrials_total = ntrials_total + ntrials_total_tmp;

@@ -42,7 +42,7 @@ for type_i=types_i
 
         id = [types{type_i} num2str(p, '%02d')];
         classes_ = load( ...
-            [dir_training_datasets id filename], ...
+            fullfile(dir_training_datasets, [id filename]), ...
             'rest', 'palmar', 'lateral');
         classes = {classes_.rest,...
             classes_.palmar,...
@@ -71,7 +71,7 @@ for type_i=types_i
     end
 end
 
-save([dir_results 'classification' filename_save], 'calib_conf', 'calib_gamma', 'test_conf', 'test_gamma', 'timepoint', 'run_times');
+save(fullfile(dir_results, ['classification' filename_save]), 'calib_conf', 'calib_gamma', 'test_conf', 'test_gamma', 'timepoint', 'run_times');
 plot_results([], ['classification' filename_save], 'rep', types_i, filename, calibration_cut);
 
 if notify
