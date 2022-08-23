@@ -22,7 +22,7 @@ addpath preprocess
 % -------------------------------------------------------------------------
 participant_index = 15;  % between 1 and 15
 eeg_system = 'H';       % 'G', 'V' or 'H'
-filename_ica = '_preprocessed_ica.set';  % eeglab dataset name for caching the data before manually removing ICA components
+filename_ica = '_ica.set';  % eeglab dataset name for caching the data before manually removing ICA components
 filename = '_preprocessed.mat';  % training dataset name (saved as)
 % =========================================================================
 
@@ -53,10 +53,7 @@ preprocess_ica(participant_index, eeg_system, filename_ica);
 load('config.mat', 'dir_eeglab_datasets');
 EEG = pop_loadset('filename',[id filename_ica],'filepath',dir_eeglab_datasets);
 
-latencies = [EEG.event.latency];
-fprintf(['Eye blinking: ' num2str(latencies(strcmp({EEG.event.type}, 'EBon'))/EEG.srate) ' seconds\n']);
-fprintf(['Vertical eye: ' num2str(latencies(strcmp({EEG.event.type}, 'VEon'))/EEG.srate) ' seconds\n']);
-fprintf(['Horizon. eye: ' num2str(latencies(strcmp({EEG.event.type}, 'HEon'))/EEG.srate) ' seconds\n']);
+print_artifact_times;
 
 % Plot -> Component activations
 pop_eegplot( EEG, 0, 1, 1);

@@ -21,7 +21,7 @@ function acl = adjust_chance_level(naive, n, alpha, multcomp)
 
     % calc
     n = round(n);  % must be integer
-    alpha_corr = alpha / multcomp;
+    alpha_corr = alpha / multcomp;  % bonferroni correction
     % section 2.2 in [Combrisson et al., 2015]
     acl = binoinv(1-alpha_corr, n, naive) / n;
 end

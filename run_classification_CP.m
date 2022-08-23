@@ -19,11 +19,12 @@ load('config.mat', 'dir_results');
 % =========================================================================
 % CONFIG
 % -------------------------------------------------------------------------
-filename = '_preprocessed_without_ica.mat';
-filename_save = '_G_without_ica_norm.mat';
+filename = '_preprocessed.mat';
+filename_save = '_G_norm.mat';
 cv_repetitions = 1;  % we should have enough data for accurate results without repeating cv
-amplitude_normalization = true;  % whether to normlize participants by GFP
+amplitude_normalization = true;  % whether to normalize participants by GFP
 device_i = 1;  % device index to use
+notify = true;  % play sound when finished
 % =========================================================================
 
 % ============================= load all data =============================
@@ -71,3 +72,9 @@ end
 
 save(fullfile(dir_results, ['CP_classification' filename_save]), 'calib_conf', 'calib_gamma', 'test_conf', 'test_gamma', 'timepoint', 'run_times');
 plot_results([], ['CP_classification' filename_save], 'CP', device_i, filename, 14/15);
+
+if notify
+    % play success sound
+    load handel.mat;
+    sound(y,Fs);
+end

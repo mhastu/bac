@@ -9,8 +9,8 @@ addpath preprocess
 % -------------------------------------------------------------------------
 participants = 1:15;  % max 1:15
 systems = ['V'];      % max ['G', 'V', 'H']
-filename_ica = '_preprocessed_ica.set';  % loaded from
-filename = '_preprocessed_without_ica.mat';  % saved as
+filename_ica = '_rmc.set';  % loaded from
+filename = '_preprocessed.mat';  % saved as
 rest_wait = 8;  % time (s) to wait after rest-onset and before rest-offset for trial extraction
 
 load('config.mat', 'dir_eeglab_datasets');

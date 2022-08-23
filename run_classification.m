@@ -17,12 +17,12 @@ load('config.mat', 'dir_results');
 % =========================================================================
 % CONFIG
 % -------------------------------------------------------------------------
-filename = '_preprocessed_without_ica.mat';
-filename_save = '_V_without_ica_randcalib.mat';
+filename = '_preprocessed.mat';
+filename_save = '_V_randcalib.mat';
 randcalib = true;  % if calibration data should be randomly selected among trials
 types_i = 2;  % type indices to use
 notify = true;  % play sound when finished
-participant_indices = [3 4 6 8 10 11 12 13 14];
+participant_indices = 1:15;
 
 calibration_cut = 0.66;
 % =========================================================================

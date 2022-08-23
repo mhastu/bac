@@ -39,6 +39,11 @@ Sources[^datensatz_studie][^blankertz_2011][^schaefer_shrinkage][^duda_pattern][
 | `_rmc.set` | after removing independent components, before finishing preprocessing |
 | `.mat.set` | after finishing preprocessing                                         |
 
+# A word on parallelisation and GPU usage
+This package uses `parfor` to run a for loop on multiple workers (see `best_timepoint.m`) and also Matlab's built-in function `gpuArray` (see `scov.m`). Both are great ways to quickly use multi core CPUs and GPUs without changing much code, but also lack some logic behin the curtains. Using both with a single GPU may result in an 'Out of memory on device' error and I found no other way to fix it, than just using fewer workers. What I tried:
+- Check available GPU memory before transferring arrays, using `D = gpuDevice; D.AvailableMemory`. It seems that this is not real-time data and therefore too slow.
+- Catch the error using `try...catch`. The error somehow just gets through. Maybe `try` only works in a non-parallel context?
+
 ---
 # References
 [^datensatz_studie]: [Müller-Putz et al., 2020] Schwarz, A., Escolano, C., Montesano, L., Müller-Putz, G. (2020). "Analyzing and Decoding Natural Reach-and-Grasp Actions Using Gel, Water and Dry EEG Systems" Frontiers in Neuroscience 14. https://doi.org/10.3389/fnins.2020.00849

@@ -27,18 +27,19 @@ load('config.mat', 'dir_results');
 
 if nargin < 6
     calib_cut = 0.66;
+    %calib_cut = 14/15;
 end
 if nargin < 5
-    filename_train = '_preprocessed_without_ica.mat';
+    filename_train = '_preprocessed.mat';
 end
 if nargin < 4
-    Devs = 2;  % device indices to use (gel, water, dry)
+    Devs = 2;  % device indices to use (gel G, water V, dry H)
 end
 if nargin < 3
     method = 'rep';  % one of ['rep', 'CP']
 end
 if nargin < 2
-    filename_result = 'classification_V_without_ica_randcalib.mat';
+    filename_result = 'classification_V_randcalib.mat';
 end
 % use same figures if possible
 if nargin < 1 || ~iscell(fig_results) || ~(length(fig_results) == 3)

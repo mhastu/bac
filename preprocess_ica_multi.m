@@ -9,7 +9,7 @@ addpath preprocess
 % -------------------------------------------------------------------------
 participants = 1:15;  % max 1:15
 systems = ['V'];      % max ['G', 'V', 'H']
-filename = '_preprocessed_ica.set';  % saved as
+filename = '_ica.set';  % saved as
 run_ica = true;
 rm12 = true;  % if 'Hero', remove channel 'A2' (12) before preprocessing
 notify = true;  % play sound when finished
