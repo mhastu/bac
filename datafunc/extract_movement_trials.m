@@ -1,4 +1,4 @@
-function [trials, framestarts, len, event_latencies] = extract_movement_trials(eeg, header, type, frame)
+function [trials, framestarts, len, event_latencies] = extract_movement_trials(eeg, header, type, frame, dtype)
 %EXTRACT_MOVEMENT_TRIALS Extract trials of movement events.
 %
 %   trials = EXTRACT_MOVEMENT_TRIALS(eeg, header, type, frame) returns
@@ -10,6 +10,10 @@ function [trials, framestarts, len, event_latencies] = extract_movement_trials(e
 %       header:
 %       type: 'palmar' or 'lateral'
 %       frame: time frame to extract: [begin end]
+
+    if nargin < 5
+        dtype = 'single';
+    end
 
     fs = eeg.srate;
     start = int32(frame(1)*fs);  % start (ampval index) w.r.t. the event
@@ -49,5 +53,5 @@ function [trials, framestarts, len, event_latencies] = extract_movement_trials(e
         % remove channel 'A2'
         train_channels = header.channels_eeg(~strcmp(header.channels_labels(header.channels_eeg), 'A2'));
     end
-    trials = get_trials_from_frames(eeg.data(train_channels, :), framestarts, len);
+    trials = get_trials_from_frames(eeg.data(train_channels, :), framestarts, len, dtype);
 end

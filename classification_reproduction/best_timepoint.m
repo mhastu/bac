@@ -1,8 +1,9 @@
-function [timepoint_i, conf, gamma] = best_timepoint(classes, t_indices, cv_repetitions)
+function [timepoint_i, conf, gamma] = best_timepoint(classes, t_indices, cv_repetitions, n_workers, regularize, dtype)
 %BEST_TIMEPOINT Find best time point in WOI.
 %
-%   timepoint_i = BEST_TIMEPOINT(classes, t_indices) returns the timepoint
-%       index (in t_indices) of the best performing model.
+%   timepoint_i = BEST_TIMEPOINT(classes, t_indices, cv_repetitions,
+%                 n_workers) returns the timepoint index (in t_indices) of
+%                 the best performing model.
 %       classes: { trials_1, ..., trials_C }
 %           C...number of classes
 %           trials_i: R-by-L-by-N matrix
@@ -11,6 +12,12 @@ function [timepoint_i, conf, gamma] = best_timepoint(classes, t_indices, cv_repe
 %               N...number of trials
 %       t_indices: indices of the amplitude values used as features w.r.t.
 %           the timepoint.
+%       cv_repetitions: (optional) how often to repeat cross-validation
+%           (default: 10)
+%       n_workers: (optional) number of workers for parallel computing
+%           (default: 4)
+%       regularize: (optional) logical, whether to regularize the
+%           covariance matrix (needed for small datasets) (default: true)
 %
 %   [timepoint_i, conf] = BEST_TIMEPOINT(classes, t_indices)
 %       also returns the confusion matrix for each timepoint in the WOI
@@ -28,9 +35,17 @@ function [timepoint_i, conf, gamma] = best_timepoint(classes, t_indices, cv_repe
     if nargin < 3
         cv_repetitions = 10;
     end
-    cv_fold = 5;
+    if nargin < 4
+        n_workers = 4;
+    end
+    if nargin < 5
+        regularize = -1;
+    end
+    if nargin < 6
+        dtype = 'single';
+    end
 
-    fprintf('Finding best timepoint:');
+    cv_fold = 5;
     
     C = length(classes);
     sizes = zeros(C, 3);
@@ -51,15 +66,34 @@ function [timepoint_i, conf, gamma] = best_timepoint(classes, t_indices, cv_repe
     trainclasses = cell(T, C); % trainals for each timepoint and class
     for t=1:T
         for c=1:C
-            trainclasses{t, c} = get_trainals_for_timepoint(classes{c}, t_indices, t);
+            trainclasses{t, c} = get_trainals_for_timepoint(classes{c}, t_indices, t, dtype);
         end
     end
-    % for parallel: parfor, for non-parallel: for
-    parfor t=1:T
-        [confs(:,:,t), gamma(:,:,:,t)] = cvmda(trainclasses(t, :), cv_repetitions, cv_fold);
-        accuracies(t) = sum(diag(confs(:,:,t))) / sum(confs(:,:,t), 'all') / C;
-        %confs(:,:,t) = confs(:,:,t) ./ sum(confs(:,:,t), 2);  % row-wise normalize
-        fprintf('\b|\n');
+    if n_workers > 1  % parallel computing
+        p = gcp('nocreate'); % If no pool, do not create new one.
+        if isempty(p)
+            poolsize = 0;
+        else
+            poolsize = p.NumWorkers;
+        end
+        if poolsize ~= n_workers
+            parpool(n_workers);
+        end
+        fprintf('Finding best timepoint:');
+        parfor t=1:T
+            [confs(:,:,t), gamma(:,:,:,t)] = cvmda(trainclasses(t, :), cv_repetitions, cv_fold, regularize, dtype);
+            accuracies(t) = sum(diag(confs(:,:,t))) / sum(confs(:,:,t), 'all') / C;
+            %confs(:,:,t) = confs(:,:,t) ./ sum(confs(:,:,t), 2);  % row-wise normalize
+            fprintf('\b|\n');
+        end
+    else  % single-threaded
+        fprintf('Finding best timepoint:');
+        for t=1:T
+            [confs(:,:,t), gamma(:,:,:,t)] = cvmda(trainclasses(t, :), cv_repetitions, cv_fold, regularize, dtype);
+            accuracies(t) = sum(diag(confs(:,:,t))) / sum(confs(:,:,t), 'all') / C;
+            %confs(:,:,t) = confs(:,:,t) ./ sum(confs(:,:,t), 2);  % row-wise normalize
+            fprintf('\b|\n');
+        end
     end
     [~, timepoint_i] = max(accuracies);
     conf = confs;  % report the un-normalized confusion-matrices for all timepoints

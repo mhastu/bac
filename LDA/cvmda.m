@@ -1,4 +1,4 @@
-function [conf, gamma] = cvmda(classes, R, K)
+function [conf, gamma] = cvmda(classes, R, K, regularize, dtype)
 %CVMDA Repeated K-fold cross-validate multiple shrinkage-based LDA.
 %   Splits each class into k folds and uses k-1 for training and 1 for
 %   evaluation. This step is repeated r times and the overall mean of the
@@ -13,9 +13,18 @@ function [conf, gamma] = cvmda(classes, R, K)
 %               n_i...number of trainals in class i
 %       R: number of repetitions
 %       K: number of folds
+%       regularize: (optional) logical, whether to regularize the
+%           covariance matrix (needed for small datasets) (default: true)
 %
 %   [conf, gamma] = CVMDA(classes, R, K) also returns the shrinkage
 %       parameters. gamma is a K-by-C-by-R matrix.
+
+    if nargin < 4
+        regularize = -1;
+    end
+    if nargin < 5
+        dtype = 'single';
+    end
 
     C = length(classes);  % number of classes
 
@@ -40,7 +49,7 @@ function [conf, gamma] = cvmda(classes, R, K)
                 train_classes{c} = classes{c}(training(partitions{c}, k),:);
                 test_classes{c} = classes{c}(test(partitions{c}, k),:);
             end
-            [classify, gamma(k, :, r)] = train_mda(train_classes);
+            [classify, gamma(k, :, r)] = train_mda(train_classes, regularize, dtype);
             for c=1:C
                 confs(c, :, r, k) = sum(classify(test_classes{c}) == (1:C), 1);
             end

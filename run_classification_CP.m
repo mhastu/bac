@@ -20,10 +20,13 @@ load('config.mat', 'dir_results');
 % CONFIG
 % -------------------------------------------------------------------------
 filename = '_preprocessed.mat';
-filename_save = '_G_norm.mat';
+filename_save = '_G_fixedreg_0.4_double.mat';
 cv_repetitions = 1;  % we should have enough data for accurate results without repeating cv
-amplitude_normalization = true;  % whether to normalize participants by GFP
-device_i = 1;  % device index to use
+amplitude_normalization = false;  % whether to normalize participants by GFP
+device_i = 1;  % device index to use, 1..3 for {'G', 'V', 'H'}
+regularize = 0.4;  % amount of regularization (0-1, 0 for no regularization, -1 to automatically calculate)
+n_workers = 4;  % number of workers for parallel computing (1 for single-trheaded)
+dtype = 'double';
 notify = true;  % play sound when finished
 % =========================================================================
 
@@ -65,7 +68,7 @@ for p=1:15
 
     [test_conf{device_i, p}, timepoint{device_i, p}, calib_conf{device_i, p}, ...
     calib_gamma{device_i, p}, test_gamma{device_i, p}] = ...
-        run_classification_for(calib_classes, test_classes, cv_repetitions);
+        run_classification_for(calib_classes, test_classes, cv_repetitions, n_workers, regularize, dtype);
 
     run_times(device_i, p) = toc;
 end

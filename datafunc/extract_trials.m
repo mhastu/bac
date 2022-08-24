@@ -2,11 +2,14 @@ function [rest, palmar, lateral, ...
     rest_start, rest_len, ...
     palm_start, palm_len, ...
     lat_start, lat_len, ...
-    palm_latency, lat_latency] = extract_trials(eeg, header, rest_wait)
+    palm_latency, lat_latency] = extract_trials(eeg, header, rest_wait, dtype)
 %EXTRACT_TRIALS
 
     if nargin < 3
         rest_wait = 8;
+    end
+    if nargin < 4
+        dtype = 'single';
     end
 
     % config
@@ -23,7 +26,7 @@ function [rest, palmar, lateral, ...
     % from the preceding second of each timepoint in WOI.
     trial_frame = [WOI(1)-(feature_gap*(feature_length-1)-1)/fs, WOI(2)];
 
-    [rest, rest_start, rest_len] = extract_rest_trials(eeg, header, trial_frame, rest_wait);
-    [palmar, palm_start, palm_len, palm_latency] = extract_movement_trials(eeg, header, 'palmar', trial_frame);
-    [lateral, lat_start, lat_len, lat_latency] = extract_movement_trials(eeg, header, 'lateral', trial_frame);
+    [rest, rest_start, rest_len] = extract_rest_trials(eeg, header, trial_frame, rest_wait, dtype);
+    [palmar, palm_start, palm_len, palm_latency] = extract_movement_trials(eeg, header, 'palmar', trial_frame, dtype);
+    [lateral, lat_start, lat_len, lat_latency] = extract_movement_trials(eeg, header, 'lateral', trial_frame, dtype);
 end

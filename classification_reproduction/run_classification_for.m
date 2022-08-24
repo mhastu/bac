@@ -1,4 +1,4 @@
-function [test_conf, timepoint, calib_conf, calib_gamma, test_gamma] = run_classification_for(calib_classes, test_classes, cv_repetitions)
+function [test_conf, timepoint, calib_conf, calib_gamma, test_gamma] = run_classification_for(calib_classes, test_classes, cv_repetitions, n_workers, regularize, dtype)
 %RUN_CLASSIFICATION_FOR Run classification for given calibration and test classes.
 
     % imports
@@ -26,6 +26,15 @@ function [test_conf, timepoint, calib_conf, calib_gamma, test_gamma] = run_class
     if nargin < 3
         cv_repetitions = 10;  % default
     end
+    if nargin < 4
+        n_workers = 4;  % default
+    end
+    if nargin < 5
+        regularize = -1;  % default
+    end
+    if nargin < 6
+        dtype = 'single';  % default
+    end
     % config
     WOI = [-2 3];        % window of interest in seconds (open on left side)
     feature_length = 9;  % number of ampvals before the point of interest
@@ -35,7 +44,7 @@ function [test_conf, timepoint, calib_conf, calib_gamma, test_gamma] = run_class
     % feature indices w.r.t. the timepoint
     t_indices = int32(0:feature_gap:(feature_length-1)*feature_gap);
 
-    [timepoint_i, calib_conf, calib_gamma] = best_timepoint(calib_classes, t_indices, cv_repetitions);
+    [timepoint_i, calib_conf, calib_gamma] = best_timepoint(calib_classes, t_indices, cv_repetitions, n_workers, regularize, dtype);
     timepoint = WOI(1) + timepoint_i/fs; % count-based timepoint index omits left limit of WOI
 
     T = L - t_indices(end);  % number of timepoints
@@ -44,16 +53,16 @@ function [test_conf, timepoint, calib_conf, calib_gamma, test_gamma] = run_class
     fprintf('Training winning model.\n');
     calib_data = cell(1, C);
     for c=1:C
-        calib_data{c} = get_trainals_for_timepoint(calib_classes{c}, t_indices, timepoint_i);
+        calib_data{c} = get_trainals_for_timepoint(calib_classes{c}, t_indices, timepoint_i, dtype);
     end
-    [classify, test_gamma] = train_mda(calib_data);
+    [classify, test_gamma] = train_mda(calib_data, regularize, dtype);
 
     % test winning model for each timepoint
     fprintf('Testing winning model.\n');
     test_conf = zeros(C, C, T);
     for t=1:T
         for c=1:C
-            test_data = get_trainals_for_timepoint(test_classes{c}, t_indices, int32(t));
+            test_data = get_trainals_for_timepoint(test_classes{c}, t_indices, int32(t), dtype);
             test_conf(c, :, t) = sum(classify(test_data) == (1:3), 1);
         end
     end

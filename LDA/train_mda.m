@@ -1,4 +1,4 @@
-function [classify, gamma] = train_mda(classes)
+function [classify, gamma] = train_mda(classes, regularize, dtype)
 %TRAIN_MDA Train shrinkage-based multiple LDA bayes classifier.
 %
 %   classify = TRAIN_MDA(classes) returns the classify function of the
@@ -8,6 +8,8 @@ function [classify, gamma] = train_mda(classes)
 %           class i: n_i-by-D matrix.
 %               D...number of features
 %               n_i...number of trainals in class i
+%       regularize: (optional) logical, whether to regularize the
+%           covariance matrix (needed for small datasets) (default: true)
 %
 %   [classify, gamma] = TRAIN_MDA(classes) also returns the estimated
 %       shrinkage parameters for each class (1-by-C matrix)
@@ -16,6 +18,13 @@ function [classify, gamma] = train_mda(classes)
 %
 %   References:
 %   [Duda et al., 2011]: Duda, R.O., Hart, P.E., Stork, D.G., 2001. Pattern Classification, 2nd Edition. Wiley & Sons. ISBN: 978-0-471-05669-0
+
+    if nargin < 2
+        regularize = -1;
+    end
+    if nargin < 3
+        dtype = 'single';
+    end
 
     C = length(classes);
 
@@ -29,7 +38,7 @@ function [classify, gamma] = train_mda(classes)
         error('all trainals must have same length');
     end
 
-    [W, gamma] = LDA(classes);
+    [W, gamma] = LDA(classes, regularize, dtype);
 
     function [class_i] = classify_(z)
         % returns the estimated class indices of the given trainals

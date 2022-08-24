@@ -1,4 +1,4 @@
-function [trials, latencies, len] = extract_rest_trials(eeg, header, frame, space_s)
+function [trials, latencies, len] = extract_rest_trials(eeg, header, frame, space_s, dtype)
 %EXTRACT_REST_TRIALS Extract rest trials.
 %
 %   trials = EXTRACT_REST_TRIALS(eeg, header, frame, space_s) returns the
@@ -10,6 +10,10 @@ function [trials, latencies, len] = extract_rest_trials(eeg, header, frame, spac
 %       header: loaded from dataset
 %       frame: time frame to extract: [begin end]
 %       space_s: time to omit after rest onset and before rest offset in s
+
+    if nargin < 5
+        dtype = 'single';
+    end
 
     fs = eeg.srate;
 
@@ -44,5 +48,5 @@ function [trials, latencies, len] = extract_rest_trials(eeg, header, frame, spac
         % remove channel 'A2'
         train_channels = header.channels_eeg(~strcmp(header.channels_labels(header.channels_eeg), 'A2'));
     end
-    trials = get_trials_from_frames(eeg.data(train_channels,:),latencies,len);
+    trials = get_trials_from_frames(eeg.data(train_channels,:),latencies,len,dtype);
 end
