@@ -31,7 +31,7 @@ config.cv_repetitions = 1;  % we should have enough data for accurate results wi
 config.regularize = -1;  % amount of regularization (0-1, 0 for no regularization, -1 to automatically calculate)
 config.n_workers = 4;  % number of workers for parallel computing (1 for single-trheaded)
 config.dtype = 'single';  % datatype to use. usually 'single' is sufficient and faster
-config.gpu = false;  % whether to use gpu
+config.gpu = true;  % whether to use gpu
 
 notify = false;  % play sound when finished
 % =========================================================================

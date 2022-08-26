@@ -17,6 +17,6 @@ function [test_conf, timepoint, calib_conf, calib_gamma, test_gamma] = run_AS_cl
     fprintf('Testing winning model on each system.\n');
     test_conf = cell(size(test_classes,3), 1);
     for s=1:size(test_classes,3)
-        test_conf{s} = test_model(test_classes(1,s,:), classify, T, t_indices, config);
+        test_conf{s} = test_model(test_classes(1,:,s), classify, T, t_indices, config);
     end
 end

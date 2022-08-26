@@ -1,4 +1,4 @@
-function fig_results = plot_results_AS(filename_result, filename_train)
+function [] = plot_results_AS(filename_result, filename_train)
 
 % imports
 addpath datafunc
@@ -32,7 +32,6 @@ device_color = {[0.9290 0.6940 0.1220], [0.133 0.471 0.698], [0.38 0.137 0.424]}
 load(fullfile(dir_results, filename_result), ...
      'calib_conf', 'test_conf');
 C = 3;  % number of classes
-np = size(calib_conf,2);  % number of participants
 
 %% convert cells
 calib_conf_mat = zeros(C, C, T, size(calib_conf,2));
@@ -103,76 +102,58 @@ nexttile(2);
 cla;
 plotConfMat(calib_pmean_confmat_normalized(:,:,best_timepoint_i), {'rest', 'pal', 'lat'}, 'Grand average peak performance (%)')
 % ---------------------------------------------------------
-% ------------------ TEST ---------------------------------
+% ----------------------- TEST (BOTTOM) -------------------
 %% calc
-% accuracy for each participant (dim5) over whole WOI (dim3)
-for dev=1:3
-    test_pspec_accuracy = sum(test_conf_mat(:,:,:,dev,:) .* eye(C), [1,2]) ./ sum(test_conf_mat(:,:,:,dev,:), [1,2]);
-    test_pmean_accuracy = mean(test_pspec_accuracy, 5);
-    [test_pspec_peak_accuracy, test_pspec_best_timepoint_i] = max(test_pspec_accuracy, [], 3);
+% test accuracy for each participant and system
+test_spspec_accuracy = sum(test_conf_mat(:,:,:,:,:) .* eye(C), [1,2]) ./ sum(test_conf_mat(:,:,:,:,:), [1,2]);
+test_spmean_accuracy = mean(test_spspec_accuracy, [4,5]);
+[test_spspec_peak_accuracy, test_spspec_best_timepoint_i] = max(test_spspec_accuracy, [], 3);
 
-    test_pspecmean_confmat = zeros(C, C, size(test_conf,2));
+test_spspecmean_confmat = zeros(C, C, size(test_conf,2));
+for s=1:size(test_conf,1)
     for p=1:size(test_conf,2)
-        % best timepoint index for each participant
-        best_timepoint_indices = permute(test_pspec_best_timepoint_i, [5 1 2 3 4]);
+        % best timepoint index for each participant and system
+        best_timepoint_indices = permute(test_spspec_best_timepoint_i, [5 1 2 3 4]);
         % assign the participant-specific performance peaks to the confmat
-        test_pspecmean_confmat(:,:,p) = test_conf_mat(:,:,best_timepoint_indices(p),dev,p);
+        test_spspecmean_confmat(:,:,p,s) = test_conf_mat(:,:,best_timepoint_indices(p),s,p);
     end
-    test_pspecmean_confmat = sum(test_pspecmean_confmat, 3);
-    test_pspecmean_confmat_normalized = test_pspecmean_confmat ./ sum(test_pspecmean_confmat, 2);
+end
+test_spspecmean_confmat = sum(test_spspecmean_confmat, [3,4]);
+test_spspecmean_confmat_normalized = test_spspecmean_confmat ./ sum(test_spspecmean_confmat, 2);
 
-    test_significance = adjust_chance_level(1/C, sum(num_trials_per_sys)/15,alpha,T);
+test_significance = adjust_chance_level(1/C, sum(num_trials_per_sys)/15,alpha,T);
+%% plot participant and system specific test accuracy over whole WOI
+nexttile(3);
+cla;
+xline(0, 'HandleVisibility', 'off');
+hold on
+box off;
+ylim([0 100])
+xlim(WOI)
 
-    %% plot participant specific test accuracy over whole WOI
-    switch dev
-        case 1
-            nexttile(3);
-        case 2
-            % device 2 and 3 in new figure
-            versatile_and_hero = figure();
-            tiledlayout(2, 2, 'TileSpacing', 'tight');
-            nexttile(1);
-        case 3
-            nexttile(3);
+for s=1:size(test_conf_mat, 4)
+    for p=1:size(test_conf_mat, 5)
+        % make last participant test plot visible for legend
+        if ((s==3)&&(p==15)); handlevis='on'; else handlevis='off'; end
+        plot(t, permute(test_spspec_accuracy(:,:,:,s,p), [1 3 2]) .* 100, '-', 'Color', [0.7, 0.7, 0.7], 'LineWidth', 0.7, 'HandleVisibility', handlevis);
+        stem(t(test_spspec_best_timepoint_i(:,:,:,s,p)), test_spspec_peak_accuracy(:,:,:,s,p) * 100, 'filled', 'Color', device_color{dev}, 'LineStyle', 'none', 'HandleVisibility', handlevis);
     end
-    cla;
-    xline(0, 'HandleVisibility', 'off');
-    hold on
-    box off;
-    ylim([0 100])
-    xlim(WOI)
+end
 
-    for p=1:(size(test_conf_mat, 5)-1)
-        plot(t, permute(test_pspec_accuracy(:,:,:,:,p), [1 3 2]) .* 100, '-', 'Color', [0.7, 0.7, 0.7], 'LineWidth', 0.7, 'HandleVisibility', 'off');
-        stem(t(test_pspec_best_timepoint_i(:,:,:,:,p)), test_pspec_peak_accuracy(:,:,:,:,p) * 100, 'filled', 'Color', device_color{dev}, 'LineStyle', 'none', 'HandleVisibility', 'off');
-    end
-    % make last participant test plot visible for legend
-    p = size(test_conf_mat, 5);
-    plot(t, permute(test_pspec_accuracy(:,:,:,:,p), [1 3 2]) .* 100, '-', 'Color', [0.7, 0.7, 0.7], 'LineWidth', 0.7);
-    stem(t(test_pspec_best_timepoint_i(:,:,:,:,p)), test_pspec_peak_accuracy(:,:,:,:,p) * 100, 'filled', 'Color', device_color{dev}, 'LineStyle', 'none');
+plot(t, permute(test_spmean_accuracy, [1 3 2]) .* 100, '-', 'Color', 'black', 'LineWidth', 2);
+yline(test_significance*100, 'g--', 'LineWidth', 3)
 
-    plot(t, permute(test_pmean_accuracy, [1 3 2]) .* 100, '-', 'Color', 'black', 'LineWidth', 2);
-    yline(test_significance*100, 'g--', 'LineWidth', 3)
+legend('participant/system accuracy', 'participant/system peak', 'grand average accuracy', ['significance: ' num2str(test_significance*100, '%.1f') '%'])
 
-    legend('participant accuracy', 'participant peak', 'grand average participant accuracy', ['significance: ' num2str(test_significance*100, '%.1f') '%'])
+xlabel('time (s)')
+ylabel('Accuracy (%)')
+title({'Best performing Classification model', 'applied on unseen Testdata'})
 
-    xlabel('time (s)')
-    ylabel('Accuracy (%)')
-    title({'Best performing Classification model', 'applied on unseen Testdata'})
-
-    %% plot conf mat corresponding to peak of grand average calib accuraccy
-    switch dev
-        case 1
-            nexttile(4);
-        case 2
-            % device 2 and 3 in new figure
-            nexttile(2);
-        case 3
-            nexttile(4);
-    end
-    cla;
-    plotConfMat(test_pspecmean_confmat_normalized, {'rest', 'pal', 'lat'}, 'Grand average participant peaks (%)', device_color{dev})
-    % ---------------------------------------------------------
+%% plot conf mat corresponding to peak of grand average calib accuraccy
+nexttile(4);
+cla;
+plotConfMat(test_spspecmean_confmat_normalized, {'rest', 'pal', 'lat'}, 'Grand average participant/system peaks (%)')
+% ---------------------------------------------------------
 
 end
 
