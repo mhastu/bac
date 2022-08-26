@@ -17,7 +17,7 @@ function [trials] = get_trials_from_frames(signal, latencies, len, dtype)
     n_channels = size(signal, 1);
     n_trials = length(latencies);
 
-    trials = zeros(n_channels, len, n_trials, dtype);
+    trials = zeros([n_channels, len, n_trials], dtype);
     for i=1:n_trials
         indices = latencies(i):latencies(i)+len-1;
         trials(:,:,i) = signal(:,indices);

@@ -139,7 +139,7 @@ function [ntrials_rej, ntrials_total] = preprocess_finish(eeg, header, filename,
     palmar = get_trials_from_frames(eeg.data(train_channels, :), palm_start, palm_len);
     lateral = get_trials_from_frames(eeg.data(train_channels, :), lat_start, lat_len);
     save(fullfile(dir_training_datasets, filename), ...
-        'rest', 'palmar', 'lateral', 'rest_start', 'rest_len', 'palm_start', 'palm_len', 'lat_start', 'lat_len');
+        'rest', 'palmar', 'lateral', 'rest_start', 'rest_len', 'palm_start', 'palm_len', 'lat_start', 'lat_len', 'train_channels');
     fprintf(['File ' filename ' saved in ' dir_training_datasets '\n']);
 
     % also save EEGLAB dataset

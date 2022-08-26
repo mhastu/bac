@@ -1,4 +1,4 @@
-function [timepoint_i, conf, gamma] = best_timepoint(classes, t_indices, cv_repetitions, n_workers, regularize, dtype)
+function [timepoint_i, conf, gamma] = best_timepoint(classes, t_indices, config)
 %BEST_TIMEPOINT Find best time point in WOI.
 %
 %   timepoint_i = BEST_TIMEPOINT(classes, t_indices, cv_repetitions,
@@ -12,12 +12,10 @@ function [timepoint_i, conf, gamma] = best_timepoint(classes, t_indices, cv_repe
 %               N...number of trials
 %       t_indices: indices of the amplitude values used as features w.r.t.
 %           the timepoint.
-%       cv_repetitions: (optional) how often to repeat cross-validation
+%       config.cv_repetitions: (optional) how often to repeat cross-validation
 %           (default: 10)
-%       n_workers: (optional) number of workers for parallel computing
+%       config.n_workers: (optional) number of workers for parallel computing
 %           (default: 4)
-%       regularize: (optional) logical, whether to regularize the
-%           covariance matrix (needed for small datasets) (default: true)
 %
 %   [timepoint_i, conf] = BEST_TIMEPOINT(classes, t_indices)
 %       also returns the confusion matrix for each timepoint in the WOI
@@ -33,20 +31,18 @@ function [timepoint_i, conf, gamma] = best_timepoint(classes, t_indices, cv_repe
 
     %config
     if nargin < 3
-        cv_repetitions = 10;
+        config = struct();
     end
-    if nargin < 4
-        n_workers = 4;
+    if ~isfield(config, 'cv_repetitions')
+        config.cv_repetitions = 10;
     end
-    if nargin < 5
-        regularize = -1;
+    if ~isfield(config, 'cv_fold')
+        config.cv_fold = 5;
     end
-    if nargin < 6
-        dtype = 'single';
+    if ~isfield(config, 'n_workers')
+        config.n_workers = 4;
     end
 
-    cv_fold = 5;
-    
     C = length(classes);
     sizes = zeros(C, 3);
     for i=1:C
@@ -59,29 +55,29 @@ function [timepoint_i, conf, gamma] = best_timepoint(classes, t_indices, cv_repe
     end
 
     T = L - t_indices(end);  % number of timepoints
-    gamma = zeros(cv_fold, C, cv_repetitions, T);
+    gamma = zeros(config.cv_fold, C, config.cv_repetitions, T);
 
     confs = zeros(C, C, T);    % confusion matrix for each timepoint
     accuracies = zeros(1, T);  % accuracy for each timepoint
     trainclasses = cell(T, C); % trainals for each timepoint and class
     for t=1:T
         for c=1:C
-            trainclasses{t, c} = get_trainals_for_timepoint(classes{c}, t_indices, t, dtype);
+            trainclasses{t, c} = get_trainals_for_timepoint(classes{c}, t_indices, t, config);
         end
     end
-    if n_workers > 1  % parallel computing
+    if config.n_workers > 1  % parallel computing
         p = gcp('nocreate'); % If no pool, do not create new one.
         if isempty(p)
             poolsize = 0;
         else
             poolsize = p.NumWorkers;
         end
-        if poolsize ~= n_workers
-            parpool(n_workers);
+        if poolsize ~= config.n_workers
+            parpool(config.n_workers);
         end
         fprintf('Finding best timepoint:');
         parfor t=1:T
-            [confs(:,:,t), gamma(:,:,:,t)] = cvmda(trainclasses(t, :), cv_repetitions, cv_fold, regularize, dtype);
+            [confs(:,:,t), gamma(:,:,:,t)] = cvmda(trainclasses(t, :), config);
             accuracies(t) = sum(diag(confs(:,:,t))) / sum(confs(:,:,t), 'all') / C;
             %confs(:,:,t) = confs(:,:,t) ./ sum(confs(:,:,t), 2);  % row-wise normalize
             fprintf('\b|\n');
@@ -89,7 +85,7 @@ function [timepoint_i, conf, gamma] = best_timepoint(classes, t_indices, cv_repe
     else  % single-threaded
         fprintf('Finding best timepoint:');
         for t=1:T
-            [confs(:,:,t), gamma(:,:,:,t)] = cvmda(trainclasses(t, :), cv_repetitions, cv_fold, regularize, dtype);
+            [confs(:,:,t), gamma(:,:,:,t)] = cvmda(trainclasses(t, :), config);
             accuracies(t) = sum(diag(confs(:,:,t))) / sum(confs(:,:,t), 'all') / C;
             %confs(:,:,t) = confs(:,:,t) ./ sum(confs(:,:,t), 2);  % row-wise normalize
             fprintf('\b|\n');

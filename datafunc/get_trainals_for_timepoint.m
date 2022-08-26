@@ -1,4 +1,4 @@
-function [trainals] = get_trainals_for_timepoint(trials, t_indices, t, dtype)
+function [trainals] = get_trainals_for_timepoint(trials, t_indices, t, config)
 %GET_TRAINALS_FOR_TIMEPOINT Get training data for given timepoint.
 %
 %   trainals = GET_TRAINALS_FOR_TIMEPOINT(trials, t_indices, t) returns the
@@ -12,13 +12,16 @@ function [trainals] = get_trainals_for_timepoint(trials, t_indices, t, dtype)
 %       t: timepoint (count-based ampval index)
 
     if nargin < 4
-        dtype = 'single';
+        config = struct();
+    end
+    if ~isfield(config, 'dtype')
+        config.dtype = 'single';
     end
 
     n_channels = size(trials,1); % R
     n_trials = size(trials, 3);  % N
 
-    trainals = zeros(n_trials, length(t_indices)*n_channels, dtype);
+    trainals = zeros(n_trials, length(t_indices)*n_channels, config.dtype);
     for i=1:n_trials
         % store all EEG channels of this event reshaped to one array
         indices = t_indices + t;

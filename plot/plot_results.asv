@@ -63,6 +63,11 @@ device_color = {[0.9290 0.6940 0.1220], [0.133 0.471 0.698], [0.38 0.137 0.424]}
 %% load results
 load(fullfile(dir_results, filename_result), ...
      'calib_conf', 'test_conf');
+if strcmp(method,'LSa')
+    load(fullfile(dir_results, filename_result), 'test_conf_all');
+end
+if ~exist('test_conf_all', 'var')
+    error(['test_conf_all not found in ' filename_result ', but needed for plotting the test performance on all participants at once.']);
 C = 3;  % number of classes
 np = size(calib_conf,2);  % number of participants
 
@@ -114,6 +119,8 @@ for dev=Devs
             calib_significance = adjust_chance_level(1/C, calib_cut*num_trials_per_sys(dev)/np,alpha,T);
         case 'CP'
             calib_significance = adjust_chance_level(1/C, calib_cut*num_trials_per_sys(dev),alpha,T);
+        case 'LSa'
+            calib_significance = adjust_chance_level(1/C, sum(num_trials_per_sys([1:dev-1 dev+1:3])),alpha,T);
         case 'LS'
             calib_significance = adjust_chance_level(1/C, sum(num_trials_per_sys([1:dev-1 dev+1:3])),alpha,T);
         otherwise
@@ -135,7 +142,7 @@ for dev=Devs
     plot_calib_mean = plot(t, calib_pmean_accuracy .* 100, 'x', 'MarkerEdgeColor', [0.4, 0.4, 0.4], 'MarkerSize', 7, 'LineWidth', 1.5);
     yline(100/3);
     yline(calib_significance*100, 'g--', 'LineWidth', 3)
-    if ~strcmp(method, 'LS')  % no STD for leaveout-system
+    if ~strcmp(method, 'LS') || ~strcmp(method, 'LSa')  % no STD for leaveout-system
         plot_std(t, calib_pmean_accuracy * 100, calib_std * 100)
         calib_legend_entries = {'mean', 'cue', ['significance: ' num2str(calib_significance*100, '%.1f') '%'], 'Standard deviation', ['max acc: ' num2str(calib_pmean_peak_accuracy*100, '%.1f') '%']};
     else
@@ -179,6 +186,9 @@ for dev=Devs
             test_significance = adjust_chance_level(1/C, (1-calib_cut)*num_trials_per_sys(dev)/np,alpha,T);
         case 'CP'
             test_significance = adjust_chance_level(1/C, (1-calib_cut)*num_trials_per_sys(dev),alpha,T);
+        case 'LSa'
+            test_pall_accuracy = sum(test_conf_all{dev} .* eye(C), [1,2]) ./ sum(test_conf_all{dev}, [1,2]);
+            test_significance = adjust_chance_level(1/C, num_trials_per_sys(dev),alpha,T);
         case 'LS'
             test_significance = adjust_chance_level(1/C, num_trials_per_sys(dev),alpha,T);
         otherwise
@@ -204,8 +214,9 @@ for dev=Devs
     stem(t(test_pspec_best_timepoint_i(:,:,:,:,p)), test_pspec_peak_accuracy(:,:,:,:,p) * 100, 'filled', 'Color', device_color{dev}, 'LineStyle', 'none');
 
     plot(t, permute(test_pmean_accuracy, [1 3 2]) .* 100, '-', 'Color', 'black', 'LineWidth', 2);
+    if ~
     yline(test_significance*100, 'g--', 'LineWidth', 3)
-                  
+
     legend('participant accuracy', 'participant peak', 'grand average participant accuracy', ['significance: ' num2str(test_significance*100, '%.1f') '%'])
 
     xlabel('time (s)')

@@ -6,7 +6,7 @@
 % 2. run
 
 % imports
-% reuse functions for single-participant classification
+% reuse functions from single-participant classification
 addpath classification_reproduction
 addpath datafunc
 addpath plot
@@ -21,12 +21,15 @@ load('config.mat', 'dir_results');
 % -------------------------------------------------------------------------
 filename = '_preprocessed.mat';
 filename_save = '_G_fixedreg_0.4_double.mat';
-cv_repetitions = 1;  % we should have enough data for accurate results without repeating cv
-amplitude_normalization = false;  % whether to normalize participants by GFP
+participant_normalization = false;  % whether to normalize participants by GFP
 device_i = 1;  % device index to use, 1..3 for {'G', 'V', 'H'}
-regularize = 0.4;  % amount of regularization (0-1, 0 for no regularization, -1 to automatically calculate)
-n_workers = 4;  % number of workers for parallel computing (1 for single-trheaded)
-dtype = 'double';
+
+config = struct();
+config.cv_repetitions = 1;  % we should have enough data for accurate results without repeating cv
+config.regularize = 0.4;  % amount of regularization (0-1, 0 for no regularization, -1 to automatically calculate)
+config.n_workers = 4;  % number of workers for parallel computing (1 for single-trheaded)
+config.dtype = 'double';
+
 notify = true;  % play sound when finished
 % =========================================================================
 
@@ -34,22 +37,16 @@ notify = true;  % play sound when finished
 devices = {'G', 'V', 'H'};
 classes = cell(15, 3);  % 15 participants, 3 classes
 for p=1:15
-    id = [devices{device_i} num2str(p, '%02d')];
-    classes_ = load( ...
-        fullfile(dir_training_datasets, [id filename]), ...
-        'rest', 'palmar', 'lateral');
-    classes{p,1} = classes_.rest;
-    classes{p,2} = classes_.palmar;
-    classes{p,3} = classes_.lateral;
-    clearvars classes_;
+    classes{p,:} = load_classes(filename, devices{device_i}, p).';
 end
-if amplitude_normalization
+if participant_normalization
     % schwarz 2020, section G
     % normalize participant-specific potentials by average GFP during rest
     classes = normalize_participants(classes, 1);
 end
 % =========================================================================
 
+description = "3-by-15 cells: 3 systems, 15 test participants (trained on the other 14)";
 calib_conf = cell(3, 15);
 calib_gamma = cell(3, 15);
 test_conf = cell(3, 15);
@@ -68,12 +65,12 @@ for p=1:15
 
     [test_conf{device_i, p}, timepoint{device_i, p}, calib_conf{device_i, p}, ...
     calib_gamma{device_i, p}, test_gamma{device_i, p}] = ...
-        run_classification_for(calib_classes, test_classes, cv_repetitions, n_workers, regularize, dtype);
+        run_classification_for(calib_classes, test_classes, config);
 
     run_times(device_i, p) = toc;
 end
 
-save(fullfile(dir_results, ['CP_classification' filename_save]), 'calib_conf', 'calib_gamma', 'test_conf', 'test_gamma', 'timepoint', 'run_times');
+save(fullfile(dir_results, ['CP_classification' filename_save]), 'calib_conf', 'calib_gamma', 'test_conf', 'test_gamma', 'timepoint', 'run_times', 'description', 'devices');
 plot_results([], ['CP_classification' filename_save], 'CP', device_i, filename, 14/15);
 
 if notify

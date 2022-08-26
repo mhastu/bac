@@ -15,15 +15,19 @@ function [classes] = normalize_participants(classes, class_i)
     % imports
     addpath util
 
-    gfp = NaN(15, 1);
+    gfp = NaN(size(classes,1), 1, size(classes,3));
     for p=1:size(classes,1)
-        gfp(p) = mean(GFP(classes{p, class_i}), 'all');
+        for s=1:size(classes,3)
+            gfp(p,s) = mean(GFP(classes{p, class_i, s}), 'all');
+        end
     end
-    gfp = gfp / mean(gfp);  % keep grand average GFP the same
+    gfp = gfp / mean(gfp,'all');  % keep grand average GFP the same
 
     for p=1:size(classes,1)
         for c=1:size(classes,2)
-            classes{p,c} = classes{p,c} / gfp(p);
+            for s=1:size(classes,3)
+                classes{p,c,s} = classes{p,c,s} / gfp(p,s);
+            end
         end
     end
 end
