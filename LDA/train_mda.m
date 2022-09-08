@@ -1,5 +1,5 @@
 function [classify, gamma] = train_mda(classes, config)
-%TRAIN_MDA Train shrinkage-based multiple LDA bayes classifier.
+%TRAIN_MDA Train shrinkage-based multiclass LDA bayes classifier.
 %
 %   classify = TRAIN_MDA(classes) returns the classify function of the
 %       trained model which can be applied for evaluation.

@@ -27,7 +27,7 @@ function [test_conf, timepoint, calib_conf, calib_gamma, test_gamma] = run_class
         error('all trials must have same length');
     end
 
-    [classify, T, timepoint, calib_conf, calib_gamma, test_gamma] = calibrate_model(calib_classes, config);
+    [classify, T, t_indices, timepoint, calib_conf, calib_gamma, test_gamma] = calibrate_model(calib_classes, config);
 
     % test winning model for each timepoint
     fprintf('Testing winning model.\n');

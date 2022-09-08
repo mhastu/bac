@@ -20,24 +20,30 @@ load('config.mat', 'dir_results');
 % CONFIG
 % -------------------------------------------------------------------------
 filename = '_preprocessed.mat';
-filename_save = '_G_fixedreg_0.4_double.mat';
-participant_normalization = false;  % whether to normalize participants by GFP
+filename_save = '_G_allnorm_noreg.mat';
+electrode_normalization = true;  % whether to normalize the electrodes by average Power
+participant_normalization = true;  % whether to normalize participants by GFP
 device_i = 1;  % device index to use, 1..3 for {'G', 'V', 'H'}
 
 config = struct();
 config.cv_repetitions = 1;  % we should have enough data for accurate results without repeating cv
-config.regularize = 0.4;  % amount of regularization (0-1, 0 for no regularization, -1 to automatically calculate)
+config.regularize = 0;  % amount of regularization (0-1, 0 for no regularization, -1 to automatically calculate)
 config.n_workers = 4;  % number of workers for parallel computing (1 for single-trheaded)
-config.dtype = 'double';
+config.dtype = 'single';
+config.gpu = false;
 
-notify = true;  % play sound when finished
+notify = false;  % play sound when finished
 % =========================================================================
 
 % ============================= load all data =============================
 devices = {'G', 'V', 'H'};
 classes = cell(15, 3);  % 15 participants, 3 classes
 for p=1:15
-    classes{p,:} = load_classes(filename, devices{device_i}, p).';
+    classes(p,:) = load_classes(filename, devices{device_i}, p).';
+end
+if electrode_normalization
+    % normalize electrode-specific potentials by average Power during rest
+    classes = normalize_electrodes(classes, 1);
 end
 if participant_normalization
     % schwarz 2020, section G
@@ -70,7 +76,7 @@ for p=1:15
     run_times(device_i, p) = toc;
 end
 
-save(fullfile(dir_results, ['CP_classification' filename_save]), 'calib_conf', 'calib_gamma', 'test_conf', 'test_gamma', 'timepoint', 'run_times', 'description', 'devices');
+save(fullfile(dir_results, ['CP_classification' filename_save]), 'calib_conf', 'calib_gamma', 'test_conf', 'test_gamma', 'timepoint', 'run_times', 'description', 'devices', 'config');
 plot_results([], ['CP_classification' filename_save], 'CP', device_i, filename, 14/15);
 
 if notify

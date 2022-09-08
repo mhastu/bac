@@ -23,15 +23,16 @@ load('config.mat', 'dir_results');
 % CONFIG
 % -------------------------------------------------------------------------
 filename = '_preprocessed.mat';
-filename_save = '.mat';
-participant_normalization = false;  % whether to normalize participants by GFP
+filename_save = '_allnorm_noreg.mat';
+participant_normalization = true;  % whether to normalize participants by GFP
+electrode_normalization = true;  % whether to normalize the electrodes by average Power
 
 config = struct();
 config.cv_repetitions = 1;  % we should have enough data for accurate results without repeating cv
-config.regularize = -1;  % amount of regularization (0-1, 0 for no regularization, -1 to automatically calculate)
+config.regularize = 0;  % amount of regularization (0-1, 0 for no regularization, -1 to automatically calculate)
 config.n_workers = 4;  % number of workers for parallel computing (1 for single-trheaded)
 config.dtype = 'single';  % datatype to use. usually 'single' is sufficient and faster
-config.gpu = true;  % whether to use gpu
+config.gpu = false;  % whether to use gpu
 
 notify = false;  % play sound when finished
 % =========================================================================
@@ -44,6 +45,10 @@ for device_i=1:3
     for p=1:15
         classes(p,:,device_i) = load_classes(filename,devices{device_i},p,common_electrodes).';
     end
+end
+if electrode_normalization
+    % normalize electrode-specific potentials by average Power during rest
+    classes = normalize_electrodes(classes, 1);
 end
 if participant_normalization
     % schwarz 2020, section G
@@ -79,7 +84,7 @@ for p=1:15
     run_times{p} = toc;
 end
 
-save(fullfile(dir_results, ['AS_classification' filename_save]), 'calib_conf', 'calib_gamma', 'test_conf', 'win_gamma', 'timepoint', 'run_times', 'description', 'devices');
+save(fullfile(dir_results, ['AS_classification' filename_save]), 'calib_conf', 'calib_gamma', 'test_conf', 'win_gamma', 'timepoint', 'run_times', 'description', 'devices', 'config', 'electrode_normalization', 'participant_normalization');
 
 plot_results_AS(['AS_classification' filename_save], filename);
 

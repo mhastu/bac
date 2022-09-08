@@ -15,8 +15,9 @@ function [test_conf, timepoint, calib_conf, calib_gamma, test_gamma] = run_LS_cl
 
     % test winning model for each timepoint and each participant
     fprintf('Testing winning model on each participant.\n');
-    test_conf = cell(1, size(test_classes,1));
-    for p=1:size(test_classes,1)
+    P = size(test_classes,1);  % number of test participants
+    test_conf = cell(1, P);
+    for p=1:P
         test_conf{p} = test_model(test_classes(p,:), classify, T, t_indices, config);
     end
 end

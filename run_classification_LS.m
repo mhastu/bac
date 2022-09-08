@@ -22,14 +22,16 @@ load('config.mat', 'dir_results');
 % CONFIG
 % -------------------------------------------------------------------------
 filename = '_preprocessed.mat';
-filename_save = '.mat';
-participant_normalization = false;  % whether to normalize participants by GFP
+filename_save = '_allnorm_noreg.mat';
+participant_normalization = true;  % whether to normalize participants by GFP
+electrode_normalization = true;  % whether to normalize the electrodes by average Power
 
 config = struct();
 config.cv_repetitions = 1;  % we should have enough data for accurate results without repeating cv
-config.regularize = -1;  % amount of regularization (0-1, 0 for no regularization, -1 to automatically calculate)
-config.n_workers = 4;  % number of workers for parallel computing (1 for single-trheaded)
+config.regularize = 0;  % amount of regularization (0-1, 0 for no regularization, -1 to automatically calculate)
+config.n_workers = 4;  % number of workers for parallel computing (1 for single-threaded)
 config.dtype = 'single';
+config.gpu = false;
 
 notify = true;  % play sound when finished
 % =========================================================================
@@ -42,6 +44,10 @@ for device_i=1:3
     for p=1:15
         classes(p,:,device_i) = load_classes(filename,devices{device_i},p,common_electrodes).';
     end
+end
+if electrode_normalization
+    % normalize electrode-specific potentials by average Power during rest
+    classes = normalize_electrodes(classes, 1);
 end
 if participant_normalization
     % schwarz 2020, section G
@@ -77,7 +83,7 @@ for test_device_i=1:3
     run_times{test_device_i} = toc;
 end
 
-save(fullfile(dir_results, ['LS_classification' filename_save]), 'calib_conf', 'calib_gamma', 'test_conf', 'win_gamma', 'timepoint', 'run_times', 'description', 'devices');
+save(fullfile(dir_results, ['LS_classification' filename_save]), 'calib_conf', 'calib_gamma', 'test_conf', 'win_gamma', 'timepoint', 'run_times', 'description', 'devices', 'participant_normalization', 'electrode_normalization', 'config');
 
 for test_device_i=1:3
     plot_results([], ['LS_classification' filename_save], 'LS', test_device_i, filename, 1);

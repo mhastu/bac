@@ -73,10 +73,12 @@ function [timepoint_i, conf, gamma] = best_timepoint(classes, t_indices, config)
             poolsize = p.NumWorkers;
         end
         if poolsize ~= config.n_workers
+            delete(p);
             parpool(config.n_workers);
         end
         fprintf('Finding best timepoint:');
         parfor t=1:T
+            warning("off","parallel:gpu:device:DeviceDeprecated");
             [confs(:,:,t), gamma(:,:,:,t)] = cvmda(trainclasses(t, :), config);
             accuracies(t) = sum(diag(confs(:,:,t))) / sum(confs(:,:,t), 'all') / C;
             %confs(:,:,t) = confs(:,:,t) ./ sum(confs(:,:,t), 2);  % row-wise normalize

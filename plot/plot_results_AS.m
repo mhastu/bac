@@ -26,7 +26,9 @@ T = length(t);
 systems = {'G', 'V', 'H'};
 
 %% style config
-device_color = {[0.9290 0.6940 0.1220], [0.133 0.471 0.698], [0.38 0.137 0.424]};  % accent color of each device
+accent_color = "blue";
+% not used in AS
+% device_color = {[0.9290 0.6940 0.1220], [0.133 0.471 0.698], [0.38 0.137 0.424]};  % accent color of each device
 
 %% load results
 load(fullfile(dir_results, filename_result), ...
@@ -53,6 +55,7 @@ for dev=1:3
 end
 
 calib_and_gel = figure();
+calib_and_gel.Name = filename_result;
 tiledlayout(2, 2, 'TileSpacing', 'tight');
 % ------------------ CALIB (TOP ROW) ----------------------
 %% calc
@@ -87,7 +90,7 @@ yline(calib_significance*100, 'g--', 'LineWidth', 3)
 plot_std(t, calib_pmean_accuracy * 100, calib_std * 100)
 calib_legend_entries = {'mean', 'cue', ['significance: ' num2str(calib_significance*100, '%.1f') '%'], 'Standard deviation', ['max acc: ' num2str(calib_pmean_peak_accuracy*100, '%.1f') '%']};
 
-plot_calib_peak = stem(t(best_timepoint_i), calib_pmean_peak_accuracy * 100, 'filled', 'Color', device_color{dev}, 'LineWidth', 3);
+plot_calib_peak = stem(t(best_timepoint_i), calib_pmean_peak_accuracy * 100, 'filled', 'Color', accent_color, 'LineWidth', 3);
 
 legend(calib_legend_entries{:})
 uistack(plot_calib_mean', 'top')
@@ -136,7 +139,7 @@ for s=1:size(test_conf_mat, 4)
         % make last participant test plot visible for legend
         if ((s==3)&&(p==15)); handlevis='on'; else handlevis='off'; end
         plot(t, permute(test_spspec_accuracy(:,:,:,s,p), [1 3 2]) .* 100, '-', 'Color', [0.7, 0.7, 0.7], 'LineWidth', 0.7, 'HandleVisibility', handlevis);
-        stem(t(test_spspec_best_timepoint_i(:,:,:,s,p)), test_spspec_peak_accuracy(:,:,:,s,p) * 100, 'filled', 'Color', device_color{dev}, 'LineStyle', 'none', 'HandleVisibility', handlevis);
+        stem(t(test_spspec_best_timepoint_i(:,:,:,s,p)), test_spspec_peak_accuracy(:,:,:,s,p) * 100, 'filled', 'Color', accent_color, 'LineStyle', 'none', 'HandleVisibility', handlevis);
     end
 end
 

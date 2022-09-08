@@ -25,6 +25,11 @@ addpath util
 load('config.mat', 'dir_training_datasets');
 load('config.mat', 'dir_results');
 
+if nargin < 7
+    % "movement" --> find peak accuracy of movement vs. movement
+    % "all" --> find overall peak accuracy
+    maxfind = "all";
+end
 if nargin < 6
     calib_cut = 0.66;
     %calib_cut = 14/15;
@@ -33,13 +38,13 @@ if nargin < 5
     filename_train = '_preprocessed.mat';
 end
 if nargin < 4
-    Devs = 2;  % device indices to use (gel G, water V, dry H)
+    Devs = 1:3;  % device indices to use (gel G, water V, dry H)
 end
 if nargin < 3
-    method = 'rep';  % one of ['rep', 'CP']
+    method = 'LS';  % one of ['rep', 'CP']
 end
 if nargin < 2
-    filename_result = 'classification_V_randcalib.mat';
+    filename_result = 'LS_classification_allnorm.mat';
 end
 % use same figures if possible
 if nargin < 1 || ~iscell(fig_results) || ~(length(fig_results) == 3)
@@ -59,6 +64,7 @@ systems = {'G', 'V', 'H'};
 
 %% style config
 device_color = {[0.9290 0.6940 0.1220], [0.133 0.471 0.698], [0.38 0.137 0.424]};  % accent color of each device
+device_name = {'g-tec', 'Versatile', 'EEG-Hero'};
 
 %% load results
 load(fullfile(dir_results, filename_result), ...
@@ -103,7 +109,17 @@ for dev=Devs
     % unweighted mean over all participants.
     calib_pmean_accuracy = mean(calib_pspec_accuracy, 5);  % grand average mean accuracy
     calib_pmean_accuracy = permute(calib_pmean_accuracy, [1 3 2]);  % convert to row vector
-    [calib_pmean_peak_accuracy, best_timepoint_i] = max(calib_pmean_accuracy);
+    if strcmp(maxfind, "all")
+        [calib_pmean_peak_accuracy, best_timepoint_i] = max(calib_pmean_accuracy);
+    elseif strcmp(maxfind, "movement")
+        calib_pspec_accuracy_movement = sum(calib_conf_mat(2:3,:,:,dev,:) .* [0 1 0; 0 0 1], [1,2]) ./ sum(calib_conf_mat(2:3,:,:,dev,:), [1,2]);
+        calib_pmean_accuracy_movement = mean(calib_pspec_accuracy_movement, 5);
+        calib_pmean_accuracy_movement = permute(calib_pmean_accuracy_movement, [1 3 2]);  % convert to row vector
+        [~, best_timepoint_i] = max(calib_pmean_accuracy_movement);
+        calib_pmean_peak_accuracy = calib_pmean_accuracy(best_timepoint_i);
+    else
+        error(["unknown maxfind: " maxfind]);
+    end
 
     calib_std = std(calib_pspec_accuracy, 1, 5);
     calib_std = permute(calib_std, [1 3 2]);  % convert to row vector
@@ -149,19 +165,36 @@ for dev=Devs
 
     xlabel('time (s)')
     ylabel('Accuracy (%)')
-    title({'Grand average Calibration Dataset:', 'Best performing Classification model in WOI (%)'})
+    if ~strcmp(method, 'LS')
+        title({'Grand average Calibration Dataset:', 'Best performing Classification model in WOI (%)'});
+    else
+        title({['Calibration Dataset (' strjoin(device_name([1:dev-1 dev+1:3]), ' and ') '):'], 'Best performing Classification model in WOI (%)'});
+    end
 
     %% plot conf mat corresponding to peak of grand average calib accuraccy
     nexttile(2);
     cla;
-    plotConfMat(calib_pmean_confmat_normalized(:,:,best_timepoint_i), {'rest', 'pal', 'lat'}, 'Grand average peak performance (%)', device_color{dev})
+    if ~strcmp(method, 'LS')
+        plotConfMat(calib_pmean_confmat_normalized(:,:,best_timepoint_i), {'rest', 'pal', 'lat'}, 'Grand average peak performance (%)', device_color{dev})
+    else
+        plotConfMat(calib_pmean_confmat_normalized(:,:,best_timepoint_i), {'rest', 'pal', 'lat'}, 'Peak performance (%)', device_color{dev})
+    end
     % ---------------------------------------------------------
     % ------------------ TEST (BOTTOM ROW) ---------------------
     %% calc
     % accuracy for each participant (dim5) over whole WOI (dim3)
     test_pspec_accuracy = sum(test_conf_mat(:,:,:,dev,:) .* eye(C), [1,2]) ./ sum(test_conf_mat(:,:,:,dev,:), [1,2]);
     test_pmean_accuracy = mean(test_pspec_accuracy, 5);
-    [test_pspec_peak_accuracy, test_pspec_best_timepoint_i] = max(test_pspec_accuracy, [], 3);
+    if strcmp(maxfind, "all")
+        [test_pspec_peak_accuracy, test_pspec_best_timepoint_i] = max(test_pspec_accuracy, [], 3);
+    elseif strcmp(maxfind, "movement")
+        test_pspec_accuracy_movement = sum(test_conf_mat(2:3,:,:,dev,:) .* [0 1 0; 0 0 1], [1,2]) ./ sum(test_conf_mat(2:3,:,:,dev,:), [1,2]);
+        [~, test_pspec_best_timepoint_i] = max(test_pspec_accuracy_movement, [], 3);
+        [~, test_pspec_best_timepoint_i_linear] = max(test_pspec_accuracy_movement, [], 3, 'linear');  % for indexing through other matrix we somehow need 'linear'
+        test_pspec_peak_accuracy = test_pspec_accuracy(test_pspec_best_timepoint_i_linear);
+    else
+        error(["unknown maxfind: " maxfind]);
+    end
 
     test_pspecmean_confmat = zeros(C, C, size(test_conf,2));
     for p=1:size(test_conf,2)
@@ -210,7 +243,11 @@ for dev=Devs
 
     xlabel('time (s)')
     ylabel('Accuracy (%)')
-    title({'Best performing Classification model', 'applied on unseen Testdata'})
+    if ~strcmp(method, 'LS')
+        title({'Best performing Classification model', 'applied on unseen Testdata'})
+    else
+        title({'Best performing Classification model', ['applied on unseen Testdata (' device_name{dev} ')']})
+    end
 
     %% plot conf mat corresponding to peak of grand average calib accuraccy
     nexttile(4);

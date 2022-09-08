@@ -1,5 +1,5 @@
 function [conf, gamma] = cvmda(classes, config)
-%CVMDA Repeated K-fold cross-validate multiple shrinkage-based LDA.
+%CVMDA Repeated K-fold cross-validate multiclass shrinkage-based LDA.
 %   Splits each class into k folds and uses k-1 for training and 1 for
 %   evaluation. This step is repeated r times and the overall mean of the
 %   evaluation scores is reported.
