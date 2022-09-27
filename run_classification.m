@@ -1,5 +1,5 @@
 % runs the classification as in [Müller-Putz et al., 2020]
-% workspace then contains the confusion matrices and scores per timepoint
+% workspace then contains the confusion matrices and accuracies per timepoint
 %
 % steps:
 % 1. configure

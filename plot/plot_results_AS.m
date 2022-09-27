@@ -1,4 +1,4 @@
-function [] = plot_results_AS(filename_result, filename_train)
+function [calib_and_gel] = plot_results_AS(filename_result, filename_train)
 
 % imports
 addpath datafunc

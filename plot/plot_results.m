@@ -1,4 +1,4 @@
-function fig_results = plot_results(fig_results, filename_result, method, Devs, filename_train, calib_cut)
+function fig_results = plot_results(fig_results, filename_result, method, Devs, filename_train, calib_cut, maxfind)
 
 % use only test_conf and calib_conf
 % grand average = over all participants
@@ -98,7 +98,7 @@ for dev=Devs
     else
         fig_results{dev} = figure(fig_results{dev});
     end
-    fig_results{dev}.Name = filename_result;
+    fig_results{dev}.Name = [filename_result '_' systems{dev}];
     clf;
     tiledlayout(2, 2, 'TileSpacing', 'tight');
     % ------------------ CALIB (TOP ROW) ----------------------
@@ -213,7 +213,7 @@ for dev=Devs
         case 'CP'
             test_significance = adjust_chance_level(1/C, (1-calib_cut)*num_trials_per_sys(dev),alpha,T);
         case 'LS'
-            test_significance = adjust_chance_level(1/C, num_trials_per_sys(dev),alpha,T);
+            test_significance = adjust_chance_level(1/C, num_trials_per_sys(dev)/15,alpha,T);
         otherwise
             error('unknown method');
     end
